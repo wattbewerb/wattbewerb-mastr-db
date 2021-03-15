@@ -1,0 +1,21 @@
+version: '3'
+
+# To start the ensemble of docker containers:
+# docker-compose up -d
+
+services:
+  postgres:
+    image: mdillon/postgis:9.6
+    container_name: postgres_wattbewerb
+    ports:
+      - 25432:5432
+    volumes:
+      - ./data/pgdata:/var/lib/postgresql/data/pgdata
+      - ./data/shape-data:/srv/shape-data
+      - ./scripts/sql:/srv/scripts
+      - ./out/:/out
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    restart: always
+
