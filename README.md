@@ -1,10 +1,9 @@
-# Wattbewerb - MaStR DB-Klon
+# Wattbewerb-MaStR-DB
 
-Der MaStR DB Klon ist eine periodisch aktualisierte Kopie der öffentlich abrufenbaren 
-Markstammdatenregister-Daten. 
+Die WATTbewerb-MaStR-DB ist eine periodisch aktualisierte Kopie des öffentlich abrufenbaren 
+Markstammdatenregisters. 
 
-Dieses Repository umfasst Skripte zum Abruf, Reimport in eine lokale Datenbank, Datenprüfung und Anreicherungen (insbesondere derzeit noch fehlender Gemeindezuordnungen).
-
+Dieses Repository umfasst Skripte zum Abruf, Reimport in eine lokale Datenbank, Auswertungn und (geplant) Datenprüfung.
 
 ## Ablauf
 
@@ -66,10 +65,11 @@ python 03_upsert_mastr_delta.py -i out/mastr_15.03.2021.csv -c 'postgresql://pos
 
 Zum Import in eine Remote-Datenbank muss der Connectstring entsprechend angepasst werden.
 
+### Auswertungen
+Mit dem initialen Import werden die folgenden (teils materialisierten) Views angelegt:
 
-
-
-
-
-
-
+* statistik_start_per_ags
+* statistik_heute_per_ags
+* zuwachs_per_gemeinde
+* zuwachs_per_landkreis
+* zuwachs_per_bundesland
