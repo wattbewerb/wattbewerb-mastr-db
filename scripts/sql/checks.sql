@@ -3,7 +3,7 @@ SELECT 100 check_code, 'Verbrenner mit solarer Strahlungsenergie' check_name, 'P
 JOIN Hauptbrennstoff_LT on Hauptbrennstoff_LT.key = mastr.HauptbrennstoffId WHERE EnergietraegerId=2495
 UNION
 SELECT 200 check_code, 'Inplausibele Bruttoleistung' check_name,'Bruttoleistung '||bruttoleistung|| ' bei '|| AnzahlSolarModule ||' Solarmodulen unpausibel' beschreibung, gemeindeschluessel, mastrnummer, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
-WHERE bruttoleistung/AnzahlSolarModule > 0.9
+WHERE bruttoleistung/AnzahlSolarModule > 0.9 AND (bruttoleistung < 30 OR anlagenbetreiberpersonenart = 517)
 UNION
 SELECT 210 check_code, 'Koordinatenveröffentlichung bei unplausibler Bruttoleistung' check_name, 'Mögliches Datenschutzproblem wg. Koordinatenveröffentlichung trotz inplausibler Bruttoleistung '||bruttoleistung|| ' bei '|| AnzahlSolarModule ||' Solarmodulen' beschreibung, gemeindeschluessel, mastrnummer, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 WHERE bruttoleistung/AnzahlSolarModule > 0.9 AND bruttoleistung >= 30 AND anlagenbetreiberpersonenart != 517
