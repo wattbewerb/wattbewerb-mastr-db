@@ -29,3 +29,31 @@ WHERE isnbpruefungabgeschlossen=2955
 GROUP by check_code, check_name) inpruefung 
 ON geprueft.check_code = inpruefung.check_code 
 ORDER BY COALESCE(geprueft.check_code,inpruefung.check_code);
+
+CREATE OR REPLACE VIEW anzahl_auffaelligkeiten_je_gemeinde AS
+SELECT COALESCE(geprueft.gemeindeschluessel,inpruefung.gemeindeschluessel) gemeindeschluessel, 
+COALESCE(anzahl_geprueft, 0) anzahl_geprueft, 
+COALESCE(anzahl_inpruefung, 0) anzahl_inpruefung,
+COALESCE(anzahl_geprueft, 0) + COALESCE(anzahl_inpruefung,0) anzahl_gesamt FROM
+(SELECT gemeindeschluessel, count(*) anzahl_geprueft from checks 
+WHERE isnbpruefungabgeschlossen=2954
+GROUP by gemeindeschluessel) geprueft
+FULL OUTER JOIN (SELECT gemeindeschluessel, count(*) anzahl_inpruefung from checks 
+WHERE isnbpruefungabgeschlossen=2955
+GROUP by gemeindeschluessel) inpruefung 
+ON geprueft.gemeindeschluessel = inpruefung.gemeindeschluessel 
+ORDER BY COALESCE(anzahl_geprueft,0) DESC, COALESCE(anzahl_inpruefung,0) DESC;
+
+
+CREATE OR REPLACE VIEW anzahl_auffaelligkeiten_je_betreiber AS
+SELECT COALESCE(geprueft.NetzbetreiberMaStRNummer,inpruefung.NetzbetreiberMaStRNummer) NetzbetreiberMaStRNummer, 
+COALESCE(geprueft.NetzbetreiberNamen,inpruefung.NetzbetreiberNamen) NetzbetreiberNamen, 
+anzahl_geprueft, anzahl_inpruefung FROM
+(SELECT NetzbetreiberMaStRNummer, NetzbetreiberNamen, count(*) anzahl_geprueft from checks 
+WHERE isnbpruefungabgeschlossen=2954
+GROUP by NetzbetreiberMaStRNummer, NetzbetreiberNamen) geprueft
+FULL OUTER JOIN (SELECT NetzbetreiberMaStRNummer, NetzbetreiberNamen, count(*) anzahl_inpruefung from checks 
+WHERE isnbpruefungabgeschlossen=2955
+GROUP by NetzbetreiberMaStRNummer, NetzbetreiberNamen) inpruefung 
+ON geprueft.NetzbetreiberMaStRNummer = inpruefung.NetzbetreiberMaStRNummer 
+ORDER BY COALESCE(anzahl_geprueft,0) DESC, COALESCE(anzahl_inpruefung,0) DESC;
