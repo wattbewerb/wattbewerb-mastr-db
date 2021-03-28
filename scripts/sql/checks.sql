@@ -1,3 +1,5 @@
+SET search_path TO mastr,public;
+
 CREATE MATERIALIZED VIEW CHECKS AS
 SELECT 100 check_code, 'Verbrenner mit solarer Strahlungsenergie' check_name, 'Photovoltaik-Anlage mit Hauptbrennstoff '||Hauptbrennstoff_LT.value beschreibung, gemeindeschluessel, mastrnummer, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 JOIN Hauptbrennstoff_LT on Hauptbrennstoff_LT.key = mastr.HauptbrennstoffId WHERE EnergietraegerId=2495

@@ -1,3 +1,5 @@
+CREATE SCHEMA mastr;
+SET search_path TO mastr,public;
 
 DROP TABLE TechnologieStromerzeugung_LT;
 CREATE TABLE IF NOT EXISTS TechnologieStromerzeugung_LT (

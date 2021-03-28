@@ -8,7 +8,7 @@ import argparse
 import time
 
 def do_upsert(dbconnectstring, importfile):
-    engine = create_engine(dbconnectstring)
+    engine = create_engine(dbconnectstring, connect_args={"options": "-csearch_path=mastr,public"})
     df = pd.read_csv(importfile, dtype={"Gemeindeschluessel":str, "PlZ":str}, encoding='utf-8')
 
     df["DatumLetzteAktualisierung"] = pd.to_datetime(df["DatumLetzteAktualisierung"].fillna("").str[6:-2], unit='ms')
