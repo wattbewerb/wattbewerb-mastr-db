@@ -75,3 +75,10 @@ WHERE ungeprueft.IsNBPruefungAbgeschlossen=2955
 AND geprueft.IsNBPruefungAbgeschlossen=2954
 ORDER BY in_pruefung DESC;
 
+CREATE VIEW stat_plausibilitaet_bruttoleistung AS
+SELECT CASE WHEN c.isnbpruefungabgeschlossen = 2954 THEN 'Inplausibel, geprüft (kWp)' ELSE 'Inplausibel, ungeprüft (kWp)' END , SUM(bruttoleistung) bruttoleistung FROM mastr m JOIN checks c ON m.mastrnummer = c.mastrnummer WHERE energietraegerid=2495
+GROUP BY c.isnbpruefungabgeschlossen
+UNION
+SELECT 'Plausibel (kWp)', SUM(bruttoleistung) bruttoleistung FROM mastr m WHERE energietraegerid=2495 AND mastrnummer not in (select mastrnummer from checks);
+
+

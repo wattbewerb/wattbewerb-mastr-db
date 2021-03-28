@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX ON MASTR.MASTR (mastrnummer);
