@@ -30,37 +30,38 @@ Dies gilt insbesondere für Spalten, die aus anderen Spalten eindeutig abgeleite
 
 ##### Download durchführen
 
+###### Voraussetzungen
+
 Der initiale Download erfordert eine lokale Python-Installation sowie die Installation von benötigten Bibliotheken anhand der requirements.txt-Datei:
 
 ```sh
 pip install -r requirements.txt
-
-python 01_download_mastr.py
 ```
 
-### Import in die Datenbank
-Über das Skript 02_import.sh wird das Datenbank-Schema (Schlüsseltabellen, Staging-Tabelle für den Import und die mastr-Tabelle angelegt, die abgerufenen Daten in die Staging-Tabelle importiert, 
-in die mastr-Tabelle übernommen und verschiedene Datenbank-Views (teilweise als materialized Views) angelegt.
+Desweiteren wird eine existierende postgres-Instanz vorausgesetzt.
+
+###### Datenbank-Schema anlegen
+Über das Skript `01_create_schema.sh` wird das Datenbank-Schema (Schlüsseltabellen, Staging-Tabelle für den Import und die mastr-Tabelle angelegt, sowie Prüfungs- und Statistik-Views (teilweise als materialized Views) angelegt.
 
 ```sh
-./02_import.sh
+./01_create_schema.sh postgres://<connectstring>
 ```
 
-### Export und Reimport
-Um die Datenbank in eine Remote-Datenbank zu importieren, kann man über Skript 04_export_wattbewerb_dump.sh eine Dump-Datei erstellen, die sich mit
+###### Komplettdownload und Import
+
+Über das skript 02_download_and_import.sh wird die MaStR-Datenbank heruntergeladen, in die Datenbank importiert und alle materialized Views aktualisiert.
 
 ```sh
-04_transfer_wattbewerb_dump.sh <remote db connectstring>
+./02_download_and_import.sh postgres://<connectstring>
 ```
-exportieren und in eine remote (z.B. Heroku-)Datenbank reimportieren lässt.
 
 ### Tägliches Update
 
 Über das Download-Skript lassen sich auch Datensätze ab einem bestimmten Änderungszeitpunkt herunterladen und mit dem upsert-Skript importieren.
 
 ```sh
-python 01_download_mastr.py -s 15.03.2021
-python 03_upsert_mastr_delta.py -i out/mastr_15.03.2021.csv -c 'postgresql://postgres:@localhost:25432/postgres'
+python 03_download_mastr.py -s 15.03.2021
+python 04_upsert_mastr_delta.py -i out/mastr_15.03.2021.csv -c 'postgresql://postgres:@localhost:25432/postgres'
 ```
 
 Zum Import in eine Remote-Datenbank muss der Connectstring entsprechend angepasst werden.
