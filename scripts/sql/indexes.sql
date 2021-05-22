@@ -1,1 +1,2 @@
 CREATE UNIQUE INDEX ON MASTR.MASTR (mastrnummer);
+CREATE INDEX ON MASTR.MASTR (gemeindeschluessel);

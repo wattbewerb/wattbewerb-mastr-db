@@ -1,7 +1,7 @@
 CREATE SCHEMA mastr;
 SET search_path TO mastr,public;
 
-DROP TABLE TechnologieStromerzeugung_LT;
+DROP TABLE IF EXISTS TechnologieStromerzeugung_LT;
 CREATE TABLE IF NOT EXISTS TechnologieStromerzeugung_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -24,7 +24,7 @@ INSERT INTO TechnologieStromerzeugung_LT VALUES
   (840,'Sonstige'),
  (1444,'Druckwasserreaktor');
 
-DROP TABLE Hauptbrennstoff_LT;
+DROP TABLE IF EXISTS Hauptbrennstoff_LT CASCADE;
 CREATE TABLE IF NOT EXISTS Hauptbrennstoff_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -80,7 +80,7 @@ INSERT INTO Hauptbrennstoff_LT VALUES
  (2482,'Dampf (fremdbezogen)'),
  (2483,'Sonstige Wärme');
 
-DROP TABLE IsNBPruefungAbgeschlossen_LT;
+DROP TABLE IF EXISTS IsNBPruefungAbgeschlossen_LT;
 CREATE TABLE IF NOT EXISTS IsNBPruefungAbgeschlossen_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -89,7 +89,7 @@ INSERT INTO IsNBPruefungAbgeschlossen_LT VALUES
   (2954,'Geprüft'),
   (2955,'In Prüfung');
 
-DROP TABLE Statistik_LT;
+DROP TABLE IF EXISTS Statistik_LT;
 CREATE TABLE IF NOT EXISTS Statistik_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -98,7 +98,7 @@ INSERT INTO Statistik_LT VALUES
   (2883,'A'),
   (2882,'B');
 
-DROP TABLE BetriebsStatus_LT;
+DROP TABLE IF EXISTS BetriebsStatus_LT;
 CREATE TABLE IF NOT EXISTS BetriebsStatus_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -109,7 +109,7 @@ INSERT INTO BetriebsStatus_LT VALUES
  (37,'Vorübergehend stillgelegt'),
  (38,'Dauerhaft stillgelegt');
 
-DROP TABLE SystemStatus_LT;
+DROP TABLE IF EXISTS SystemStatus_LT;
 CREATE TABLE IF NOT EXISTS SystemStatus_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS SystemStatus_LT (
 INSERT INTO SystemStatus_LT VALUES
  (472,'Aktiviert'); -- Deaktiviert wird nicht veröffentlicht
 
-DROP TABLE HauptausrichtungSolarModule_LT;
+DROP TABLE IF EXISTS HauptausrichtungSolarModule_LT;
 CREATE TABLE IF NOT EXISTS HauptausrichtungSolarModule_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -134,7 +134,7 @@ INSERT INTO HauptausrichtungSolarModule_LT VALUES
  (703,'nachgeführt'),
  (704,'Ost-West');
 
-DROP TABLE VollTeilEinspeisung_LT;
+DROP TABLE IF EXISTS VollTeilEinspeisung_LT;
 CREATE TABLE IF NOT EXISTS VollTeilEinspeisung_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -143,7 +143,7 @@ INSERT INTO VollTeilEinspeisung_LT VALUES
  (688,'Volleinspeisung'),
  (689,'Teileinspeisung');
 
-DROP TABLE Energietraeger_LT;
+DROP TABLE IF EXISTS Energietraeger_LT;
 CREATE TABLE IF NOT EXISTS Energietraeger_LT (
   key INT PRIMARY KEY,
   value TEXT
@@ -169,107 +169,6 @@ INSERT INTO Energietraeger_LT VALUES
  (2957, 'Druck aus Gasleitungen'),
  (2958, 'Druck aus Wasserleitungen'); 
 
-
-DROP TABLE IF EXISTS mastr_stage;
-CREATE UNLOGGED TABLE IF NOT EXISTS mastr_stage (
-    "Id" INT,
-    "AnlagenbetreiberId" INT,
-    "AnlagenbetreiberPersonenArt" INT,
-    "AnlagenbetreiberMaskedName" TEXT,
-    "AnlagenbetreiberMaStRNummer" TEXT,
-    "AnlagenbetreiberName" TEXT,
-    "BetriebsStatusId" INT,
-    "Breitengrad" NUMERIC(8),
-    "BundeslandId" INT,
-    "DatumLetzteAktualisierung" TEXT,
-    "EinheitMeldeDatum" TEXT,
-    "EinheitName" TEXT,
-    "EndgueltigeStilllegungDatum" TEXT,
-    "Flurstueck" TEXT,
-    "Gemarkung" TEXT,
-    "Gemeinde" TEXT,
-    "Gemeindeschluessel" TEXT,
-    "GeplantesInbetriebsnahmeDatum" TEXT,
-    "Hausnummer" TEXT,
-    "InbetriebnahmeDatum" TEXT,
-    "IsNBPruefungAbgeschlossen" INT,
-    "Laengengrad" NUMERIC(8),
-    "LandId" INT,
-    "Landkreis" TEXT,
-    "LokationId" INT,
-    "LokationMastrNr" TEXT,
-    "MaStRNummer" TEXT,
-    "Migriert" TEXT,
-    "NetzbetreiberId" TEXT,
-    "NetzbetreiberMaskedNamen" TEXT,
-    "NetzbetreiberMaStRNummer" TEXT,
-    "NetzbetreiberNamen" TEXT,
-    "NetzbetreiberPersonenArt" TEXT,
-    "Ort" TEXT,
-    "Plz" TEXT,
-    "Strasse" TEXT,
-    "SystemStatusId" INT,
-    "Typ" INT,
-    "AktenzeichenGenehmigung" TEXT,
-    "AnzahlSolarModule" INT,
-    "Batterietechnologie" INT,
-    "Bruttoleistung" NUMERIC(12, 3),
-    "EegInbetriebnahmeDatum" TEXT,
-    "EegAnlageMastrNummer" TEXT,
-    "EegAnlageMeldedatum" TEXT,
-    "EegAnlagenschluessel" TEXT,
-    "EegZuschlag" TEXT,
-    "EnergietraegerId" INT,
-    "EnergietraegerName" TEXT,
-    "GemeinsamerWechselrichter" INT,
-    "Genehmigungbehoerde" TEXT,
-    "GenehmigungDatum" TEXT,
-    "GenehmigungMeldedatum" TEXT,
-    "GenehmigungsMastrNummer" TEXT,
-    "Gruppierungsobjekte" TEXT,
-    "GruppierungsobjekteIds" TEXT,
-    "HatFlexibilitaetspraemie" BOOLEAN,
-    "HauptausrichtungSolarModule" INT,
-    "HauptbrennstoffId" INT,
-    "HauptneigungswinkelSolarmodule" INT,
-    "HerstellerWindenergieanlage" INT,
-    "HerstellerWindenergieanlageBezeichnung" TEXT, -- Potentiell hoher Nachführungsaufwand, daher nicht normalisiert
-    "IsAnonymisiert" TEXT,
-    "IsEinheitNotstromaggregat" TEXT,
-    "KraftwerkName" TEXT,
-    "KraftwerkBlockName" TEXT,
-    "KwkAnlageElektrischeLeistung" NUMERIC(12,3),
-    "KwkAnlageInbetriebnahmedatum" TEXT,
-    "KwkAnlageMastrNummer" TEXT,
-    "KwkAnlageMeldedatum" TEXT,
-    "KwkZuschlag" INT,
-    "LageEinheit" INT,
-    "LageEinheitBezeichnung" TEXT,
-    "Leistungsbegrenzung" INT,
-    "MieterstromAngemeldet" TEXT,
-    "MigrationseinheitMastrNummer" INT,
-    "NabenhoeheWindenergieanlage" NUMERIC(5, 2),
-    "Nettonennleistung" NUMERIC(12, 3),
-    "NutzbareSpeicherkapazitaet" NUMERIC(10, 2),
-    "NutzungsbereichGebSA" INT,
-    "Pilotwindanlage" BOOLEAN,
-    "Prototypanlage" BOOLEAN,
-    "Regelzone" INT,
-    "RotordurchmesserWindenergieanlage" NUMERIC(5,1),
-    "SpannungsebenenId" INT,
-    "SpannungsebenenNamen" TEXT, -- Nicht normalisierte Ausgabe
-    "SpeicherEinheitMastrNummer" TEXT,
-    "Statistik" INT,
-    "TechnologieStromerzeugungId" INT,
-    "ThermischeNutzleistung" NUMERIC(12,3),
-    "Typenbezeichnung" TEXT,
-    "VollTeilEinspeisung" INT,
-    "WasserkraftErtuechtigung" TEXT,
-    "WindClusterOstseeId" INT,
-    "WindClusterNordseeId" INT,
-    "WindparkName" TEXT
-);
-
 DROP TABLE IF EXISTS mastr CASCADE;
 CREATE TABLE IF NOT EXISTS mastr (
     Id INT PRIMARY KEY,
@@ -282,7 +181,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     Breitengrad NUMERIC(8),
     BundeslandId INT,
     DatumLetzteAktualisierung TIMESTAMP,
-    EinheitMeldeDatum TEXT,
+    EinheitRegistrierungsdatum DATE,
     EinheitName TEXT,
     EndgueltigeStilllegungDatum DATE,
     Flurstueck TEXT,
@@ -316,7 +215,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     Bruttoleistung NUMERIC(12, 3),
     EegInbetriebnahmeDatum DATE,
     EegAnlageMastrNummer TEXT,
-    EegAnlageMeldedatum TEXT,
+    EegAnlageRegistrierungsdatum DATE,
     EegAnlagenschluessel TEXT,
     EegZuschlag TEXT,
     EnergietraegerId INT,
@@ -324,7 +223,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     GemeinsamerWechselrichter INT,
     Genehmigungbehoerde TEXT,
     GenehmigungDatum DATE,
-    GenehmigungMeldedatum TEXT,
+    GenehmigungRegistrierungsdatum DATE,
     GenehmigungsMastrNummer TEXT,
     Gruppierungsobjekte TEXT,
     GruppierungsobjekteIds TEXT,
@@ -341,7 +240,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     KwkAnlageElektrischeLeistung NUMERIC(12,3),
     KwkAnlageInbetriebnahmedatum DATE,
     KwkAnlageMastrNummer TEXT,
-    KwkAnlageMeldedatum TEXT,
+    KwkAnlageRegistrierungsdatum DATE,
     KwkZuschlag INT,
     LageEinheit INT,
     LageEinheitBezeichnung TEXT,
@@ -370,4 +269,10 @@ CREATE TABLE IF NOT EXISTS mastr (
     WindparkName TEXT
 );
 
-
+DROP TABLE IF EXISTS teilnehmer CASCADE;
+CREATE TABLE IF NOT EXISTS teilnehmer (
+  ags TEXT,
+  name TEXT,
+  registerDate DATE,
+  residents INT
+);
