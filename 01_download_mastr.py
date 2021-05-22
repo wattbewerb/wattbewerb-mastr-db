@@ -29,6 +29,18 @@ def download_page(url, page, file_name):
         'HauptausrichtungSolarModuleBezeichnung','HauptbrennstoffNamen',
         'VollTeilEinspeisungBezeichnung','BetriebsStatusName','SystemStatusName'], inplace=True)
 
+    # Convert mastr dateformat to iso date/timestamps
+    df["DatumLetzteAktualisierung"] = pd.to_datetime(df["DatumLetzteAktualisierung"].fillna("").str[6:-2], unit='ms')
+    df["EinheitRegistrierungsdatum"] = pd.to_datetime(df["EinheitRegistrierungsdatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
+    df["EndgueltigeStilllegungDatum"] = pd.to_datetime(df["EndgueltigeStilllegungDatum"].fillna("").str[6:-2], unit='ms')
+    df["GeplantesInbetriebsnahmeDatum"] = pd.to_datetime(df["GeplantesInbetriebsnahmeDatum"].fillna("").str[6:-2], unit='ms')
+    df["InbetriebnahmeDatum"] = pd.to_datetime(df["InbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
+    df["EegAnlageRegistrierungsdatum"] = pd.to_datetime(df["EegAnlageRegistrierungsdatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
+    df["EegInbetriebnahmeDatum"] = pd.to_datetime(df["EegInbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
+    df["GenehmigungDatum"] = pd.to_datetime(df["GenehmigungDatum"].fillna("").str[6:-2], unit='ms')
+    df["GenehmigungRegistrierungsdatum"] = pd.to_datetime(df["GenehmigungRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
+    df["KwkAnlageInbetriebnahmedatum"] = pd.to_datetime(df["KwkAnlageInbetriebnahmedatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
+    df["KwkAnlageRegistrierungsdatum"] = pd.to_datetime(df["KwkAnlageRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
     if page == 1:
         df.to_csv (file_name, index = None, header=True, float_format='%.f')
     else:
