@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 import sys, getopt
 import pandas as pd
 import json
@@ -81,23 +82,14 @@ def download(only_updates_since = None):
             break
         page = page + 1 
 
-def main(argv):
-    since_date = None
-    help_text = '01_download_mastr.py -s <Date in dd.mm.yyyy>'
-    try:
-        opts, args = getopt.getopt(argv,"hs:",["since="])
-    except getopt.GetoptError:
-        print(helptext)
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print(helptext)
-            sys.exit()
-        elif opt in ("-s", "--since"):
-            since_date = arg
+def main(args):
     start_time = time.time()
-    download(since_date)
+    download(args.since)
     print("%s seconds" % (time.time() - start_time))
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    parser = argparse.ArgumentParser()
+    # call via e.g. python 01_download_mastr.py -s 12.02.2021
+    parser.add_argument('-s', dest='since', required=False, help='Date in dd.mm.yyyy')
+    args = parser.parse_args()
+    main(args)
