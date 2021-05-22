@@ -18,6 +18,17 @@ retries = Retry(total=15,
                 status_forcelist=[ 500, 502, 503, 504 ])
 
 s.mount('http://', HTTPAdapter(max_retries=retries))
+
+def filter_duplicates(df):
+    duplicates = []
+    last_id = None
+    for index, row in df.iterrows():
+        current_id = row['Id']
+        if last_id == current_id:
+            duplicates.append(index)
+        last_id = current_id
+
+    return df.drop(duplicates)
     
 def download_page(url, page, file_name):
     response = s.get(url)
@@ -41,6 +52,10 @@ def download_page(url, page, file_name):
     df["GenehmigungRegistrierungsdatum"] = pd.to_datetime(df["GenehmigungRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
     df["KwkAnlageInbetriebnahmedatum"] = pd.to_datetime(df["KwkAnlageInbetriebnahmedatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
     df["KwkAnlageRegistrierungsdatum"] = pd.to_datetime(df["KwkAnlageRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
+    
+    if len(df.index) > RECORDS_PER_PAGE:
+        df = filter_duplicates(df)
+
     if page == 1:
         df.to_csv (file_name, index = None, header=True, float_format='%.f')
     else:
@@ -60,6 +75,7 @@ def download(only_updates_since = None):
     page = 1
     while True:
         recent_count = download_page(url.format(page, RECORDS_PER_PAGE), page, out_filename)
+
         print("Downloaded {} rows".format((page - 1) * RECORDS_PER_PAGE + recent_count))
         if recent_count < RECORDS_PER_PAGE:
             break
