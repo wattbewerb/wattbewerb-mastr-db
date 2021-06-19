@@ -66,6 +66,15 @@ python 04_upsert_mastr_delta.py -i out/mastr_15.03.2021.csv -c 'postgresql://pos
 
 Zum Import in eine Remote-Datenbank muss der Connectstring entsprechend angepasst werden.
 
+### Aktualisierung Wattbewerb Teilnehmer-Städte
+
+
+```sh
+python 04_upsert_teilnehmer.py -i data/mastr_15.03.2021.csv -c 'postgresql://postgres:@localhost:25432/postgres'
+```
+
+Zum Import in eine Remote-Datenbank muss der Connectstring entsprechend angepasst werden.
+
 ### Auswertungen
 Mit dem initialen Import werden die folgenden (teils materialisierten) Views angelegt:
 

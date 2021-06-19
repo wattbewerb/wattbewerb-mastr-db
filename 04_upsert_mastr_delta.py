@@ -30,6 +30,7 @@ def do_upsert(dbconnectstring, importfile):
 
     upsert(engine=engine,
            df=df,
+           schema='mastr',
            table_name='mastr',
            if_row_exists='update',
            dtype={},
