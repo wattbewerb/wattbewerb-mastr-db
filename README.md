@@ -83,3 +83,12 @@ Mit dem initialen Import werden die folgenden (teils materialisierten) Views ang
 * zuwachs_per_gemeinde
 * zuwachs_per_landkreis
 * zuwachs_per_bundesland
+
+## Docker
+Um den Komplett-Abruf und Datenbankimport via Docker auszuführen, lässt sich via
+
+```
+docker build -t mfdz/wattbewerb-mastr .
+docker run -v $PWD/out:/app/out/ mfdz/wattbewerb-mastr bash 02_download_and_import.sh <dbconnectstring1> [<dbconnectstring2>]
+``` 
+
