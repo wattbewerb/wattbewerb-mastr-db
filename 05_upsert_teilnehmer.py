@@ -18,7 +18,7 @@ def do_upsert(dbconnectstring, competitors_url):
 
     # Convert column names to match lowercase sql table names
     df = df.rename(columns=str.lower)
-    df.drop(columns=['id','area','urbanisation','lat','long','residentsdate','ismetropolis'], inplace=True)
+    df.drop(columns=['id','land','area','urbanisation','lat','long','residentsdate'], inplace=True)
     
     # Need to set primary key column as index
     df = df.set_index('ags')
@@ -38,7 +38,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # python 05_upsert_teilnehmer.py -i https://wattbewerb.herokuapp.com/api/competitors' -d 'postgresql://postgres:@localhost:25432/postgres'
+    # python 05_upsert_teilnehmer.py -i https://wattbewerb.herokuapp.com/api/v1/competitors' -d 'postgresql://postgres:@localhost:25432/postgres'
     parser.add_argument('-u', dest='competitors_url')
     parser.add_argument('-d', dest='dbconnectstring')
     args = parser.parse_args()

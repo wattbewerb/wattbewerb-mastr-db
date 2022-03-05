@@ -169,6 +169,17 @@ INSERT INTO Energietraeger_LT VALUES
  (2957, 'Druck aus Gasleitungen'),
  (2958, 'Druck aus Wasserleitungen'); 
 
+DROP TABLE IF EXISTS Anlagenbetreiberart_LT;
+CREATE TABLE IF NOT EXISTS Anlagenbetreiberart_LT (
+  key INT PRIMARY KEY,
+  value TEXT
+);
+INSERT INTO Anlagenbetreiberart_LT VALUES
+ (1, 'Natürliche Person'),
+ (517, 'Natürliche Person'),
+ (518, 'Organisation')
+ ;
+
 DROP TABLE IF EXISTS mastr CASCADE;
 CREATE TABLE IF NOT EXISTS mastr (
     Id INT PRIMARY KEY,
@@ -178,7 +189,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     AnlagenbetreiberMaStRNummer TEXT,
     AnlagenbetreiberName TEXT,
     BetriebsStatusId INT,
-    Breitengrad NUMERIC(8),
+    Breitengrad NUMERIC(9,6),
     BundeslandId INT,
     DatumLetzteAktualisierung TIMESTAMP,
     EinheitRegistrierungsdatum DATE,
@@ -192,13 +203,12 @@ CREATE TABLE IF NOT EXISTS mastr (
     Hausnummer TEXT,
     InbetriebnahmeDatum DATE,
     IsNBPruefungAbgeschlossen INT,
-    Laengengrad NUMERIC(8),
+    Laengengrad NUMERIC(9,6),
     LandId INT,
     Landkreis TEXT,
     LokationId INT,
     LokationMastrNr TEXT,
     MaStRNummer TEXT,
-    Migriert TEXT,
     NetzbetreiberId TEXT,
     NetzbetreiberMaskedNamen TEXT,
     NetzbetreiberMaStRNummer TEXT,
@@ -249,7 +259,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     MigrationseinheitMastrNummer INT,
     NabenhoeheWindenergieanlage NUMERIC(5, 2),
     Nettonennleistung NUMERIC(12, 3),
-    NutzbareSpeicherkapazitaet NUMERIC(10, 2),
+    NutzbareSpeicherkapazitaet NUMERIC(12, 2),
     NutzungsbereichGebSA INT,
     Pilotwindanlage BOOLEAN,
     Prototypanlage BOOLEAN,
@@ -258,7 +268,6 @@ CREATE TABLE IF NOT EXISTS mastr (
     SpannungsebenenId INT,
     SpannungsebenenNamen TEXT, -- Nicht normalisierte Ausgabe
     SpeicherEinheitMastrNummer TEXT,
-    Statistik INT,
     TechnologieStromerzeugungId INT,
     ThermischeNutzleistung NUMERIC(12,3),
     Typenbezeichnung TEXT,
@@ -273,6 +282,8 @@ DROP TABLE IF EXISTS teilnehmer CASCADE;
 CREATE TABLE IF NOT EXISTS teilnehmer (
   ags TEXT,
   name TEXT,
+  communityType TEXT,
   registerDate DATE,
   residents INT
 );
+CREATE UNIQUE INDEX name ON teilnehmer (ags);

@@ -35,6 +35,8 @@ def download_page(url, page, file_name):
     response = s.get(url)
     data = response.json()['Data']
     df = pd.json_normalize(data)
+    if len(df.index) == :
+        return 0
     
     # Drop column which can be reconstructed, e.g. values to a known key
     df.drop(columns=['Bundesland','StandortAnonymisiert','TechnologieStromerzeugung',
@@ -54,32 +56,39 @@ def download_page(url, page, file_name):
     df["KwkAnlageInbetriebnahmedatum"] = pd.to_datetime(df["KwkAnlageInbetriebnahmedatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
     df["KwkAnlageRegistrierungsdatum"] = pd.to_datetime(df["KwkAnlageRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
     
-    if len(df.index) > RECORDS_PER_PAGE:
-        df = filter_duplicates(df)
+
+    # Render IDs as ints 
+    for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
+        'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
+        'NutzungsbereichGebSA','GemeinsamerWechselrichter','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
+        'AnzahlSolarModule','TechnologieStromerzeugungId',
+        'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage','KwkZuschlag']:
+        df[col] = df[col].map(lambda x: '' if pd.isnull(x) else '%.f' % x)
+
+    df = filter_duplicates(df)
 
     if page == 1:
-        df.to_csv (file_name, index = None, header=True, float_format='%.f')
+        df.to_csv (file_name, index = None, header=True)
     else:
-        df.to_csv (file_name, index = None, header=False, float_format='%.f', mode='a')
+        df.to_csv (file_name, index = None, header=False, mode='a')
 
     return len(df.index)
 
 def download(only_updates_since = None):
     endpoint = 'https://www.marktstammdatenregister.de/MaStR/Einheit/EinheitJson/GetErweiterteOeffentlicheEinheitStromerzeugung'
     if only_updates_since:
-        url = '{}?sort=MaStRNummer-asc,DatumLetzteAktualisierung-asc&page={}&pageSize={}&group=&filter=Letzte%20Aktualisierung~gt~%27{}%27~and~Daten%20aus%20Vorg%C3%A4ngerregister%20ausblenden~eq~0'.format(endpoint, '{}', '{}', only_updates_since)
+        url = '{}?sort=MaStRNummer-asc,DatumLetzteAktualisierung-asc&page={}&pageSize={}&group=&filter=Letzte%20Aktualisierung~gt~%27{}%27'.format(endpoint, '{}', '{}', only_updates_since)
         out_filename =  'out/mastr_{}.csv'.format(only_updates_since)
     else:
-        url = '{}?sort=MaStRNummer-asc&page={}&pageSize={}&group=&filter=Daten%20aus%20Vorg%C3%A4ngerregister%20ausblenden~eq~0'.format(endpoint, '{}', '{}', '{}')
+        url = '{}?sort=MaStRNummer-asc&page={}&pageSize={}&group=&filter='.format(endpoint, '{}', '{}', '{}')
         out_filename =  'out/mastr.csv'
 
     page = 1
     while True:
         recent_count = download_page(url.format(page, RECORDS_PER_PAGE), page, out_filename)
-
-        print("Downloaded {} rows".format((page - 1) * RECORDS_PER_PAGE + recent_count))
-        if recent_count < RECORDS_PER_PAGE:
+        if recent_count == 0:
             break
+        print("Downloaded {} rows".format((page - 1) * RECORDS_PER_PAGE + recent_count))
         page = page + 1 
 
 def main(args):
