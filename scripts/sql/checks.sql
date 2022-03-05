@@ -5,13 +5,13 @@ CREATE MATERIALIZED VIEW CHECKS AS
 SELECT 100 check_code, 'Verbrenner mit solarer Strahlungsenergie' check_name, 'Photovoltaik-Anlage mit Hauptbrennstoff '||Hauptbrennstoff_LT.value beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 JOIN Hauptbrennstoff_LT on Hauptbrennstoff_LT.key = mastr.HauptbrennstoffId WHERE EnergietraegerId=2495
 UNION
-SELECT 200 check_code, 'Unplausibele Bruttoleistung' check_name,'Bruttoleistung '||bruttoleistung|| ' bei '|| AnzahlSolarModule ||' Solarmodulen unpausibel' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
+SELECT 200 check_code, 'Unplausible Bruttoleistung' check_name,'Bruttoleistung '||bruttoleistung|| 'kWp bei '|| AnzahlSolarModule ||' Solarmodulen unpausibel' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 WHERE bruttoleistung/AnzahlSolarModule > 0.9 AND (bruttoleistung < 30 OR anlagenbetreiberpersonenart = 517)
 UNION
-SELECT 210 check_code, 'Koordinatenveröffentlichung bei unplausibler Bruttoleistung' check_name, 'Mögliches Datenschutzproblem wg. Koordinatenveröffentlichung trotz unplausibler Bruttoleistung '||bruttoleistung|| ' bei '|| AnzahlSolarModule ||' Solarmodulen' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
+SELECT 210 check_code, 'Koordinatenveröffentlichung bei unplausibler Bruttoleistung' check_name, 'Mögliches Datenschutzproblem wg. Koordinatenveröffentlichung trotz unplausibler Bruttoleistung '||bruttoleistung|| 'kWp bei '|| AnzahlSolarModule ||' Solarmodulen' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 WHERE bruttoleistung/AnzahlSolarModule > 0.9 AND bruttoleistung >= 30 AND anlagenbetreiberpersonenart != 517
 UNION
-SELECT 290 check_code, 'Inbetriebnahmedatum PV-Anlage vor 1980' check_name, 'Inbetriebnahmedatum '||Inbetriebnahmedatum||' vor 1983' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr
+SELECT 290 check_code, 'Inbetriebnahmedatum PV-Anlage vor 1980' check_name, 'Inbetriebnahmedatum '||Inbetriebnahmedatum||' vor 1980' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr
 WHERE EnergietraegerId=2495 and  Inbetriebnahmedatum< '1980-01-01'
 UNION
 SELECT 300 check_code, 'Nabenhöhe unerwartet hoch' check_name, 'Nabenhöhe '||NabenhoeheWindenergieanlage||' unerwartet hoch' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr
