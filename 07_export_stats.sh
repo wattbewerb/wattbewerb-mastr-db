@@ -1,0 +1,1 @@
+psql -d $1 -f scripts/sql/export_stats.sql

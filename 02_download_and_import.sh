@@ -11,3 +11,5 @@ if [ "$#" -e 2 ]; then
 fi
 gzip out/mastr.csv
 mv out/mastr.csv.gz out/mastr_complete_`date +"%Y-%m-%d"`.csv.gz
+
+./07_export_stats.sh $1

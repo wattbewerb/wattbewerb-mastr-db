@@ -8,6 +8,26 @@ FROM mastr
 WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-13' AND HauptbrennstoffId IS NULL) as anlage
 GROUP BY ags, IsNBPruefungAbgeschlossen);
 
+DROP MATERIALIZED VIEW IF EXISTS statistik_start_per_ags_plausibel CASCADE;
+CREATE MATERIALIZED VIEW statistik_start_per_ags_plausibel AS
+(SELECT ags gemeindeschluessel, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
+(SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
+FROM mastr
+WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-13' AND HauptbrennstoffId IS NULL
+AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <300)
+) as anlage
+GROUP BY ags);
+
+DROP MATERIALIZED VIEW IF EXISTS statistik_heute_per_ags_plausibel CASCADE;
+CREATE MATERIALIZED VIEW statistik_heute_per_ags_plausibel AS
+(SELECT ags gemeindeschluessel, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
+(SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
+FROM mastr
+WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND HauptbrennstoffId IS NULL
+AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <300)
+) as anlage
+GROUP BY ags);
+
 DROP MATERIALIZED VIEW IF EXISTS statistik_heute_per_ags CASCADE;
 CREATE MATERIALIZED VIEW statistik_heute_per_ags AS
 (SELECT ags gemeindeschluessel, IsNBPruefungAbgeschlossen, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
@@ -38,6 +58,19 @@ WHERE heute_geprueft.IsNBPruefungAbgeschlossen=2954
   AND heute_inpruefung.IsNBPruefungAbgeschlossen=2955
   AND (start_geprueft.Summe_Bruttoleistung + start_inpruefung.Summe_Bruttoleistung) > 0 AND heute_geprueft.gemeindeschluessel IS NOT NULL
 ORDER BY (heute_geprueft.Summe_Bruttoleistung+heute_inpruefung.Summe_Bruttoleistung)/(start_geprueft.Summe_Bruttoleistung + start_inpruefung.Summe_Bruttoleistung) DESC;
+
+CREATE OR REPLACE VIEW zuwachs_per_gemeinde_plausibel AS
+SELECT heute.gemeindeschluessel, 
+  start.anzahl_anlagen anz_start, 
+  heute.anzahl_anlagen anz_heute,
+  ROUND(start.Summe_Bruttoleistung) Bruttoleistung_start,
+  ROUND(heute.Summe_Bruttoleistung) Bruttoleistung_aktuell,
+  heute.Summe_Bruttoleistung-start.Summe_Bruttoleistung zuwachs_kwp
+FROM statistik_heute_per_ags_plausibel heute
+FULL OUTER JOIN statistik_start_per_ags_plausibel start ON heute.gemeindeschluessel = start.gemeindeschluessel 
+WHERE start.Summe_Bruttoleistung > 0 AND heute.gemeindeschluessel IS NOT NULL
+ORDER BY (heute.Summe_Bruttoleistung-start.Summe_Bruttoleistung) DESC;
+
 
 CREATE OR REPLACE VIEW zuwachs_per_landkreis AS
 SELECT gemeindeschluessel, anz_heute_geprueft, anz_heute_inpruefung, Bruttoleistung_start_geprueft, Bruttoleistung_aktuell_geprueft, Bruttoleistung_start_inpruefung, Bruttoleistung_aktuell_inpruefung,
@@ -84,6 +117,12 @@ DROP VIEW IF EXISTS stat_ranking;
 CREATE OR REPLACE VIEW stat_ranking AS
 SELECT t.*, z.*, ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
 LEFT JOIN zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
+ORDER BY zuwachs_kwp/residents DESC;
+
+DROP VIEW IF EXISTS stat_ranking_plausibel;
+CREATE OR REPLACE VIEW stat_ranking_plausibel AS
+SELECT t.*, z.*, ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+LEFT JOIN zuwachs_per_gemeinde_plausibel z ON t.ags = z.gemeindeschluessel
 ORDER BY zuwachs_kwp/residents DESC;
 
 DROP VIEW IF EXISTS stat_ranking_nur_plausible;
