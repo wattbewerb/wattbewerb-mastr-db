@@ -35,7 +35,7 @@ def download_page(url, page, file_name):
     response = s.get(url)
     data = response.json()['Data']
     df = pd.json_normalize(data)
-    if len(df.index) == :
+    if len(df.index) == 0:
         return 0
     
     # Drop column which can be reconstructed, e.g. values to a known key
