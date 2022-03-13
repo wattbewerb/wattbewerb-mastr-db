@@ -1,6 +1,30 @@
 CREATE SCHEMA mastr;
 SET search_path TO mastr,public;
 
+DROP TABLE IF EXISTS Bundesland_LT;
+CREATE TABLE IF NOT EXISTS Bundesland_LT (
+  key INT PRIMARY KEY,
+  value TEXT,
+  schluessel TEXT
+);
+INSERT INTO Bundesland_LT VALUES
+  (1400,'Brandenburg', '12'),
+  (1401,'Berlin', '11'),
+  (1402,'Baden-Württemberg', '08'),
+  (1403,'Bayern', '09'),                            
+  (1404,'Bremen', '04'),
+  (1405,'Hessen', '06'),
+  (1406,'Hamburg', '02'),
+  (1407,'Mecklenburg-Vorpommern', '13'),
+  (1408,'Niedersachsen', '03'),
+  (1409,'Nordrhein-Westfalen', '05'),
+  (1410,'Rheinland-Pfalz', '07'),
+  (1411,'Schleswig-Holstein', '01'),
+  (1412,'Saarland', '10'),
+  (1413,'Sachsen', '14'),
+  (1414,'Sachsen-Anhalt', '15'),
+  (1415,'Thüringen', '16');
+
 DROP TABLE IF EXISTS TechnologieStromerzeugung_LT;
 CREATE TABLE IF NOT EXISTS TechnologieStromerzeugung_LT (
   key INT PRIMARY KEY,
