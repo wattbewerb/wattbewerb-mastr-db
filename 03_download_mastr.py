@@ -62,9 +62,11 @@ def download_page(url, page, file_name):
         'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
         'NutzungsbereichGebSA','GemeinsamerWechselrichter','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
         'AnzahlSolarModule','TechnologieStromerzeugungId',
-        'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage','KwkZuschlag']:
-        df[col] = df[col].map(lambda x: '' if pd.isnull(x) else '%.f' % x)
-
+        'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage']:
+        try:
+            df[col] = df[col].map(lambda x: '' if pd.isnull(x) else '%.f' % x)
+        except:
+            print('Error to render col {} as int'.format(col))
     df = filter_duplicates(df)
 
     if page == 1:
