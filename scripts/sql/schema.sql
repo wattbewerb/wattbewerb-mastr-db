@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     KwkAnlageInbetriebnahmedatum DATE,
     KwkAnlageMastrNummer TEXT,
     KwkAnlageRegistrierungsdatum DATE,
-    KwkZuschlag INT,
+    KwkZuschlag TEXT,
     LageEinheit INT,
     LageEinheitBezeichnung TEXT,
     Leistungsbegrenzung INT,
