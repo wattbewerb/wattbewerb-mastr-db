@@ -228,6 +228,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     EegAnlageRegistrierungsdatum DATE,
     EegAnlagenschluessel TEXT,
     EegZuschlag TEXT,
+    -- Zuschlagsnummern TEXT, new in 07-11.03.2022, for now ignore
     EnergietraegerId INT,
     EnergietraegerName TEXT,
     GemeinsamerWechselrichter INT,

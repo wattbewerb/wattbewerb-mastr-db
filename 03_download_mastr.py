@@ -41,7 +41,8 @@ def download_page(url, page, file_name):
     # Drop column which can be reconstructed, e.g. values to a known key
     df.drop(columns=['Bundesland','StandortAnonymisiert','TechnologieStromerzeugung',
         'HauptausrichtungSolarModuleBezeichnung','HauptbrennstoffNamen',
-        'VollTeilEinspeisungBezeichnung','BetriebsStatusName','SystemStatusName'], inplace=True)
+        'VollTeilEinspeisungBezeichnung','BetriebsStatusName','SystemStatusName',
+        'Zuschlagsnummern'], inplace=True)
 
     # Convert mastr dateformat to iso date/timestamps
     df["DatumLetzteAktualisierung"] = pd.to_datetime(df["DatumLetzteAktualisierung"].fillna("").str[6:-2], unit='ms')
