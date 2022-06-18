@@ -44,6 +44,10 @@ def download_page(url, page, file_name):
         'VollTeilEinspeisungBezeichnung','BetriebsStatusName','SystemStatusName',
         'Zuschlagsnummern'], inplace=True)
 
+    # Dropp columns currently not reflected by model
+    df.drop(columns=['IsBuergerenergie'], inplace=True)
+    df.drop(columns=['EegInstallierteLeistung'], inplace=True)
+
     # Convert mastr dateformat to iso date/timestamps
     df["DatumLetzteAktualisierung"] = pd.to_datetime(df["DatumLetzteAktualisierung"].fillna("").str[6:-2], unit='ms')
     df["EinheitRegistrierungsdatum"] = pd.to_datetime(df["EinheitRegistrierungsdatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
