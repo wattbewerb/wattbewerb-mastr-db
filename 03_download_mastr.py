@@ -30,6 +30,9 @@ def filter_duplicates(df):
         last_id = current_id
 
     return df.drop(duplicates)
+
+def to_iso_date(df, column):
+    return pd.to_datetime(df[column].fillna("").str[6:-2].replace('-.*','', regex=True).replace('253402214400000',''), unit='ms')
     
 def download_page(url, page, file_name):
     response = s.get(url)
@@ -49,18 +52,18 @@ def download_page(url, page, file_name):
     df.drop(columns=['EegInstallierteLeistung'], inplace=True)
 
     # Convert mastr dateformat to iso date/timestamps
-    df["DatumLetzteAktualisierung"] = pd.to_datetime(df["DatumLetzteAktualisierung"].fillna("").str[6:-2], unit='ms')
-    df["EinheitRegistrierungsdatum"] = pd.to_datetime(df["EinheitRegistrierungsdatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
-    df["EndgueltigeStilllegungDatum"] = pd.to_datetime(df["EndgueltigeStilllegungDatum"].fillna("").str[6:-2], unit='ms')
-    df["GeplantesInbetriebsnahmeDatum"] = pd.to_datetime(df["GeplantesInbetriebsnahmeDatum"].fillna("").str[6:-2], unit='ms')
-    df["InbetriebnahmeDatum"] = pd.to_datetime(df["InbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
-    df["EegAnlageRegistrierungsdatum"] = pd.to_datetime(df["EegAnlageRegistrierungsdatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
-    df["EegInbetriebnahmeDatum"] = pd.to_datetime(df["EegInbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
-    df["GenehmigungDatum"] = pd.to_datetime(df["GenehmigungDatum"].fillna("").str[6:-2], unit='ms')
-    df["GenehmigungRegistrierungsdatum"] = pd.to_datetime(df["GenehmigungRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
-    df["KwkAnlageInbetriebnahmedatum"] = pd.to_datetime(df["KwkAnlageInbetriebnahmedatum"].fillna("").str[6:-2].replace('-.*','', regex=True), unit='ms')
-    df["KwkAnlageRegistrierungsdatum"] = pd.to_datetime(df["KwkAnlageRegistrierungsdatum"].fillna("").str[6:-2], unit='ms')
-    
+    df["DatumLetzteAktualisierung"] = to_iso_date(df, "DatumLetzteAktualisierung")
+    df["EinheitRegistrierungsdatum"] = to_iso_date(df, "EinheitRegistrierungsdatum")
+    df["EndgueltigeStilllegungDatum"] = to_iso_date(df, "EndgueltigeStilllegungDatum")
+    df["GeplantesInbetriebsnahmeDatum"] = to_iso_date(df, "GeplantesInbetriebsnahmeDatum")
+    df["InbetriebnahmeDatum"] = to_iso_date(df, "InbetriebnahmeDatum")
+    df["EegAnlageRegistrierungsdatum"] = to_iso_date(df, "EegAnlageRegistrierungsdatum")
+    df["EegInbetriebnahmeDatum"] = to_iso_date(df, "EegInbetriebnahmeDatum")
+    df["GenehmigungDatum"] = to_iso_date(df, "GenehmigungDatum")
+    df["GenehmigungRegistrierungsdatum"] = to_iso_date(df, "GenehmigungRegistrierungsdatum")
+    df["KwkAnlageInbetriebnahmedatum"] = to_iso_date(df, "KwkAnlageInbetriebnahmedatum")
+    df["KwkAnlageRegistrierungsdatum"] = to_iso_date(df, "KwkAnlageRegistrierungsdatum")
+
 
     # Render IDs as ints 
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
