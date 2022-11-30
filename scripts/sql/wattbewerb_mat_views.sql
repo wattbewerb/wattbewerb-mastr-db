@@ -37,27 +37,28 @@ WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 
 GROUP BY ags, IsNBPruefungAbgeschlossen);
 
 CREATE OR REPLACE VIEW zuwachs_per_gemeinde AS
-SELECT heute_geprueft.gemeindeschluessel, 
-  start_geprueft.anzahl_anlagen anz_start_geprueft, 
-  start_inpruefung.anzahl_anlagen anz_start_inpruefung, 
-  heute_geprueft.anzahl_anlagen anz_heute_geprueft, 
-  heute_inpruefung.anzahl_anlagen anz_heute_inpruefung, 
-  ROUND(start_geprueft.Summe_Bruttoleistung) Bruttoleistung_start_geprueft, 
-  ROUND(heute_geprueft.Summe_Bruttoleistung) Bruttoleistung_aktuell_geprueft,
-  ROUND(start_inpruefung.Summe_Bruttoleistung) Bruttoleistung_start_inpruefung, 
-  ROUND(heute_inpruefung.Summe_Bruttoleistung) Bruttoleistung_aktuell_inpruefung,
-  ROUND((heute_geprueft.Summe_Bruttoleistung+heute_inpruefung.Summe_Bruttoleistung)-(start_geprueft.Summe_Bruttoleistung+start_inpruefung.Summe_Bruttoleistung),2) zuwachs_kwp,
-  ROUND(((heute_geprueft.Summe_Bruttoleistung+heute_inpruefung.Summe_Bruttoleistung)/(start_geprueft.Summe_Bruttoleistung+start_inpruefung.Summe_Bruttoleistung)-1)*100,2) zuwachs_prozent
-FROM statistik_heute_per_ags heute_geprueft
-FULL OUTER JOIN statistik_heute_per_ags heute_inpruefung ON heute_geprueft.gemeindeschluessel = heute_inpruefung.gemeindeschluessel 
-FULL OUTER JOIN statistik_start_per_ags start_geprueft ON heute_geprueft.gemeindeschluessel = start_geprueft.gemeindeschluessel 
-FULL OUTER JOIN statistik_start_per_ags start_inpruefung ON heute_geprueft.gemeindeschluessel = start_inpruefung.gemeindeschluessel 
-WHERE heute_geprueft.IsNBPruefungAbgeschlossen=2954
-  AND start_geprueft.IsNBPruefungAbgeschlossen=2954
-  AND start_inpruefung.IsNBPruefungAbgeschlossen=2955
-  AND heute_inpruefung.IsNBPruefungAbgeschlossen=2955
-  AND (start_geprueft.Summe_Bruttoleistung + start_inpruefung.Summe_Bruttoleistung) > 0 AND heute_geprueft.gemeindeschluessel IS NOT NULL
-ORDER BY (heute_geprueft.Summe_Bruttoleistung+heute_inpruefung.Summe_Bruttoleistung)/(start_geprueft.Summe_Bruttoleistung + start_inpruefung.Summe_Bruttoleistung) DESC;
+SELECT heute_geprueft.gemeindeschluessel,
+  start_geprueft.anzahl_anlagen AS anz_start_geprueft,
+  COALESCE(start_inpruefung.anzahl_anlagen, 0) AS anz_start_inpruefung,
+  COALESCE(heute_geprueft.anzahl_anlagen, 0) AS anz_heute_geprueft,
+  COALESCE(heute_inpruefung.anzahl_anlagen, 0) AS anz_heute_inpruefung,
+  round(COALESCE(start_geprueft.summe_bruttoleistung,0)) AS bruttoleistung_start_geprueft,
+  round(COALESCE(heute_geprueft.summe_bruttoleistung,0)) AS bruttoleistung_aktuell_geprueft,
+  round(COALESCE(start_inpruefung.summe_bruttoleistung, 0)) AS bruttoleistung_start_inpruefung,
+  round(COALESCE(heute_inpruefung.summe_bruttoleistung, 0)) AS bruttoleistung_aktuell_inpruefung,
+  round((COALESCE(heute_geprueft.summe_bruttoleistung, 0) + COALESCE(heute_inpruefung.summe_bruttoleistung,0)) - (COALESCE(start_geprueft.summe_bruttoleistung,0) + COALESCE(start_inpruefung.summe_bruttoleistung, 0)), 2) AS zuwachs_kwp,
+  round(((COALESCE(heute_geprueft.summe_bruttoleistung,0) + COALESCE(heute_inpruefung.summe_bruttoleistung,0)) / (COALESCE(start_geprueft.summe_bruttoleistung,0) + COALESCE(start_inpruefung.summe_bruttoleistung, 0)) - 1::numeric) * 100::numeric, 2) AS zuwachs_prozent
+  FROM mastr.statistik_heute_per_ags heute_geprueft
+   FULL JOIN mastr.statistik_heute_per_ags heute_inpruefung ON heute_geprueft.gemeindeschluessel = heute_inpruefung.gemeindeschluessel AND heute_inpruefung.isnbpruefungabgeschlossen = 2955
+   FULL JOIN mastr.statistik_start_per_ags start_geprueft ON heute_geprueft.gemeindeschluessel = start_geprueft.gemeindeschluessel AND start_geprueft.isnbpruefungabgeschlossen = 2954
+   FULL JOIN mastr.statistik_start_per_ags start_inpruefung ON heute_geprueft.gemeindeschluessel = start_inpruefung.gemeindeschluessel AND (start_inpruefung.isnbpruefungabgeschlossen = 2955 or start_inpruefung.isnbpruefungabgeschlossen is null)
+ WHERE 
+   heute_geprueft.isnbpruefungabgeschlossen = 2954
+  AND
+   COALESCE(start_geprueft.summe_bruttoleistung,0) + coalesce(start_inpruefung.summe_bruttoleistung, 0) > 0::numeric
+  AND 
+   heute_geprueft.gemeindeschluessel IS NOT null
+ ORDER BY ((COALESCE(heute_geprueft.summe_bruttoleistung,0) + COALESCE(heute_inpruefung.summe_bruttoleistung,0)) / (COALESCE(start_geprueft.summe_bruttoleistung,0) + COALESCE(start_inpruefung.summe_bruttoleistung, 0))) DESC;      
 
 CREATE OR REPLACE VIEW zuwachs_per_gemeinde_plausibel AS
 SELECT heute.gemeindeschluessel, 
