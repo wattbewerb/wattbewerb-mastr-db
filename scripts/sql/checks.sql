@@ -11,6 +11,20 @@ UNION
 SELECT 210 check_code, 'Koordinatenveröffentlichung bei unplausibler Bruttoleistung' check_name, 'Mögliches Datenschutzproblem wg. Koordinatenveröffentlichung trotz unplausibler Bruttoleistung '||bruttoleistung|| 'kWp bei '|| AnzahlSolarModule ||' Solarmodulen' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr 
 WHERE bruttoleistung/AnzahlSolarModule > 0.9 AND bruttoleistung >= 30 AND anlagenbetreiberpersonenart != 517
 UNION
+SELECT 270 AS check_code,
+    'Koordinate nicht in angegebener Gemeinde'::text AS check_name,
+    (((('Koordinate ('::text || m.laengengrad) || ','::text) || m.breitengrad) || ') liegt nicht in '::text) || m.gemeinde AS beschreibung,
+    m.gemeindeschluessel,
+    m.mastrnummer,
+    m.bruttoleistung,
+    m.isnbpruefungabgeschlossen,
+    m.datumletzteaktualisierung,
+    m.netzbetreibermastrnummer,
+    m.netzbetreibernamen
+   FROM mastr.mastr m
+     JOIN mastr.vg250_gem g ON g.ags::text = m.gemeindeschluessel
+  WHERE m.energietraegerid = 2495 AND m.betriebsstatusid = 35 AND GF =4 AND m.laengengrad IS NOT NULL AND NOT st_contains(g.wkb_geometry, st_setsrid(st_point(m.laengengrad::double precision, m.breitengrad::double precision), 4326))
+UNION
 SELECT 290 check_code, 'Inbetriebnahmedatum PV-Anlage vor 1980' check_name, 'Inbetriebnahmedatum '||Inbetriebnahmedatum||' vor 1980' beschreibung, gemeindeschluessel, mastrnummer, bruttoleistung, isnbpruefungabgeschlossen, datumletzteaktualisierung, NetzbetreiberMaStRNummer, NetzbetreiberNamen FROM mastr
 WHERE EnergietraegerId=2495 and  Inbetriebnahmedatum< '1980-01-01'
 UNION
