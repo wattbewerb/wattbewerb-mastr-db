@@ -133,13 +133,6 @@ LEFT JOIN zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
 LEFT JOIN unplausible_bruttoleistung_je_gemeinde b ON t.ags = b.gemeindeschluessel
 ORDER BY (zuwachs_kwp-bruttoleistung_unplausibel)/residents DESC;
 
-CREATE VIEW stat_nbpruefung AS
-SELECT IsNBPruefungAbgeschlossen, date_trunc('month',EinheitRegistrierungsdatum) RegistrierungsMonat, count(*) Anzahl
-FROM mastr.mastr
-WHERE energietraegerid=2495
-GROUP BY IsNBPruefungAbgeschlossen, date_trunc('month', EinheitRegistrierungsdatum)
-ORDER BY IsNBPruefungAbgeschlossen, date_trunc('month', EinheitRegistrierungsdatum);
-
 DROP MATERIALIZED VIEW IF EXISTS letzte_aktualisierung;
 CREATE MATERIALIZED VIEW letzte_aktualisierung AS
 SELECT MAX(DatumLetzteAktualisierung) zeitpunkt FROM mastr.mastr; 
