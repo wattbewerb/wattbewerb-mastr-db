@@ -9,6 +9,7 @@ python3 03_download_mastr.py
 if [ "$#" -e 2 ]; then
 	./06_import_mastr.sh $2
 fi
+zip -oD body.zip out/mastr.csv
 gzip out/mastr.csv
 mv out/mastr.csv.gz out/mastr_complete_`date +"%Y-%m-%d"`.csv.gz
 
