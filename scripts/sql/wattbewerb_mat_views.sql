@@ -5,7 +5,7 @@ CREATE MATERIALIZED VIEW statistik_start_per_ags AS
 (SELECT ags gemeindeschluessel, IsNBPruefungAbgeschlossen, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
 (SELECT Gemeindeschluessel ags, IsNBPruefungAbgeschlossen, Bruttoleistung brutto, Nettonennleistung netto
 FROM mastr
-WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-13' AND HauptbrennstoffId IS NULL) as anlage
+WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-21' AND HauptbrennstoffId IS NULL) as anlage
 GROUP BY ags, IsNBPruefungAbgeschlossen);
 
 DROP MATERIALIZED VIEW IF EXISTS statistik_start_per_ags_plausibel CASCADE;
@@ -13,7 +13,7 @@ CREATE MATERIALIZED VIEW statistik_start_per_ags_plausibel AS
 (SELECT ags gemeindeschluessel, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
 (SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
 FROM mastr
-WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-13' AND HauptbrennstoffId IS NULL
+WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-21' AND HauptbrennstoffId IS NULL
 AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <300)
 ) as anlage
 GROUP BY ags);
