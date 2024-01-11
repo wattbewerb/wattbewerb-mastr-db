@@ -48,41 +48,14 @@ SET search_path=mastr,public;
 -- out/datawrapper_karte_anlagen_top20_aggr
 \COPY (SELECT 'Gesamt' "Rubrik", sum(bruttoleistung) "Bruttoleistung [kWp]", count(*) "Anzahl" FROM (Select  m.bruttoleistung from mastr.mastr m  where energietraegerid=2495 and betriebsstatusid=35 order by m.bruttoleistung desc limit 20) anlagen UNION SELECT cat "Rubrik", sum(bruttoleistung) "Bruttoleistung [kWp]", count(*) "Anzahl" FROM (	Select m.bruttoleistung, CASE WHEN c.mastrnummer IS NULL THEN 'Plausibel' ELSE 'Unplausibel' END cat from mastr.mastr m LEFT OUTER JOIN mastr.checks c ON m.mastrnummer=c.mastrnummer where energietraegerid=2495 and betriebsstatusid=35 order by m.bruttoleistung desc limit 20) an GROUP BY cat ) TO 'out/datawrapper_karte_anlagen_top20_aggr.csv' WITH CSV DELIMITER ',' HEADER;
 
-SELECT t.name, u.gemeindeschluessel, summe_unplausibel "Gesamt-Bruttleistung unplausibel [kWp]", g.Summe_Bruttoleistung-summe_unplausibel "Gesamt-Bruttleistung plausibel [kWp]", ROUND(100*summe_unplausibel/g.Summe_Bruttoleistung) "Prozent unplausibel", 100-ROUND(100*(summe_unplausibel/g.Summe_Bruttoleistung)) "Prozent plausibel" 
-FROM (SELECT c.gemeindeschluessel,sum(c.bruttoleistung) summe_unplausibel FROM checks c WHERE c.check_code between 100 and 299 GROUP BY c.gemeindeschluessel) u
-JOIN teilnehmer t ON t.ags=u.gemeindeschluessel
-JOIN (SELECT gemeindeschluessel, sum(summe_bruttoleistung) summe_bruttoleistung FROM statistik_heute_per_ags GROUP BY gemeindeschluessel) g ON g.gemeindeschluessel = u.gemeindeschluessel
+\COPY (SELECT t.name, u.gemeindeschluessel, summe_unplausibel "Gesamt-Bruttleistung unplausibel [kWp]", g.Summe_Bruttoleistung-summe_unplausibel "Gesamt-Bruttleistung plausibel [kWp]", ROUND(100*summe_unplausibel/g.Summe_Bruttoleistung) "Prozent unplausibel", 100-ROUND(100*(summe_unplausibel/g.Summe_Bruttoleistung)) "Prozent plausibel" FROM (SELECT c.gemeindeschluessel,sum(c.bruttoleistung) summe_unplausibel FROM checks c WHERE c.check_code between 100 and 299 GROUP BY c.gemeindeschluessel) u JOIN teilnehmer t ON t.ags=u.gemeindeschluessel JOIN (SELECT gemeindeschluessel, sum(summe_bruttoleistung) summe_bruttoleistung FROM statistik_heute_per_ags GROUP BY gemeindeschluessel) g ON g.gemeindeschluessel = u.gemeindeschluessel) TO 'out/datawrapper_unplausible_uebersicht.csv' WITH CSV DELIMITER ',' HEADER;
  ;
 
 --, ROUND(100*summe_unplausibel/g.Summe_Bruttoleistung) "Prozent unplausibel", 100-ROUND(100*(summe_unplausibel/g.Summe_Bruttoleistung)) "Prozent plausibel" 
-\COPY (SELECT t.name, u.gemeindeschluessel, summe_unplausibel "Gesamt-Bruttleistung unplausibel [kWp]", g.Summe_Bruttoleistung-summe_unplausibel "Gesamt-Bruttleistung plausibel [kWp]"
-FROM (SELECT c.gemeindeschluessel,sum(c.bruttoleistung) summe_unplausibel FROM checks c 
-JOIN MASTR m ON c.mastrnummer=m.mastrnummer WHERE m.inbetriebnahmedatum > '2021-02-21'
-	AND BetriebsStatusId=35 AND c.check_code between 100 and 299 GROUP BY c.gemeindeschluessel) u
-JOIN teilnehmer t ON t.ags=u.gemeindeschluessel
-JOIN (SELECT gemeindeschluessel, sum(bruttoleistung) summe_bruttoleistung FROM mastr WHERE EnergietraegerId=2495 AND BetriebsStatusid=35 AND InbetriebnahmeDatum > '2021-02-21' GROUP BY gemeindeschluessel) g ON g.gemeindeschluessel = u.gemeindeschluessel
-ORDER BY summe_unplausibel/g.Summe_Bruttoleistung DESC) TO 'out/datawrapper_anteil_unplausibler_neuzugaenge.csv' WITH CSV DELIMITER ',' HEADER;
+\COPY (SELECT t.name, u.gemeindeschluessel, summe_unplausibel "Gesamt-Bruttleistung unplausibel [kWp]", g.Summe_Bruttoleistung-summe_unplausibel "Gesamt-Bruttleistung plausibel [kWp]" FROM (SELECT c.gemeindeschluessel,sum(c.bruttoleistung) summe_unplausibel FROM checks c  JOIN MASTR m ON c.mastrnummer=m.mastrnummer WHERE m.inbetriebnahmedatum > '2021-02-21'	AND BetriebsStatusId=35 AND c.check_code between 100 and 299 GROUP BY c.gemeindeschluessel) u JOIN teilnehmer t ON t.ags=u.gemeindeschluessel JOIN (SELECT gemeindeschluessel, sum(bruttoleistung) summe_bruttoleistung FROM mastr WHERE EnergietraegerId=2495 AND BetriebsStatusid=35 AND InbetriebnahmeDatum > '2021-02-21' GROUP BY gemeindeschluessel) g ON g.gemeindeschluessel = u.gemeindeschluessel ORDER BY summe_unplausibel/g.Summe_Bruttoleistung DESC) TO 'out/datawrapper_anteil_unplausibler_neuzugaenge.csv' WITH CSV DELIMITER ',' HEADER;
 
 -- out/datawrapper_anlagen_zuwachs_je_1k_ew_kleinstaedte
-\COPY (SELECT t.name, z.gemeindeschluessel, (anz_start_geprueft+ anz_start_inpruefung) anz_start,
-  ROUND((anz_start_geprueft + anz_start_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_start, 
-  (anz_heute_geprueft + anz_heute_inpruefung) anz_heute, 
-  ROUND((anz_heute_geprueft + anz_heute_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_heute, 
-  (anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung) zuwachs_anz,
-  ROUND(((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents*1000.0,1) zuwachs_anz_je_1k_ew
-  FROM zuwachs_per_gemeinde z
-  JOIN teilnehmer t ON t.ags=z.gemeindeschluessel
-  WHERE residents < 100000
-  ORDER BY ((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents DESC) TO 'out/datawrapper_anlagen_zuwachs_je_1k_ew_kleinstaedte.csv' WITH CSV DELIMITER ',' HEADER;
+\COPY (SELECT t.name, z.gemeindeschluessel, (anz_start_geprueft+ anz_start_inpruefung) anz_start, ROUND((anz_start_geprueft + anz_start_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_start,  (anz_heute_geprueft + anz_heute_inpruefung) anz_heute,  ROUND((anz_heute_geprueft + anz_heute_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_heute,  (anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung) zuwachs_anz, ROUND(((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents*1000.0,1) zuwachs_anz_je_1k_ew FROM zuwachs_per_gemeinde z JOIN teilnehmer t ON t.ags=z.gemeindeschluessel WHERE residents < 100000 ORDER BY ((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents DESC) TO 'out/datawrapper_anlagen_zuwachs_je_1k_ew_kleinstaedte.csv' WITH CSV DELIMITER ',' HEADER;
 
 -- out/datawrapper_anlagen_zuwachs_je_1k_ew_grossstaedte
-\COPY (SELECT t.name, z.gemeindeschluessel, (anz_start_geprueft+ anz_start_inpruefung) anz_start,
-  ROUND((anz_start_geprueft + anz_start_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_start, 
-  (anz_heute_geprueft + anz_heute_inpruefung) anz_heute, 
-  ROUND((anz_heute_geprueft + anz_heute_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_heute, 
-  (anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung) zuwachs_anz,
-  ROUND(((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents*1000.0,1) zuwachs_anz_je_1k_ew
-  FROM zuwachs_per_gemeinde z
-  JOIN teilnehmer t ON t.ags=z.gemeindeschluessel
-  WHERE residents >= 100000
-  ORDER BY ((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents DESC) TO 'out/datawrapper_anlagen_zuwachs_je_1k_ew_grossstaedte.csv' WITH CSV DELIMITER ',' HEADER;
+\COPY (SELECT t.name, z.gemeindeschluessel, (anz_start_geprueft+ anz_start_inpruefung) anz_start, ROUND((anz_start_geprueft + anz_start_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_start,  (anz_heute_geprueft + anz_heute_inpruefung) anz_heute,  ROUND((anz_heute_geprueft + anz_heute_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_heute,  (anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung) zuwachs_anz, ROUND(((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents*1000.0,1) zuwachs_anz_je_1k_ew FROM zuwachs_per_gemeinde z JOIN teilnehmer t ON t.ags=z.gemeindeschluessel WHERE residents >= 100000 ORDER BY ((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents DESC) TO 'out/datawrapper_anlagen_zuwachs_je_1k_ew_grossstaedte.csv' WITH CSV DELIMITER ',' HEADER;
