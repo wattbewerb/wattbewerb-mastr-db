@@ -204,6 +204,20 @@ INSERT INTO Anlagenbetreiberart_LT VALUES
  (518, 'Organisation')
  ;
 
+DROP TABLE IF EXISTS Batterietechnologie_LT;
+CREATE TABLE IF NOT EXISTS Batterietechnologie_LT (
+  key INT PRIMARY KEY,
+  value TEXT
+);
+INSERT INTO Batterietechnologie_LT VALUES
+ (727, 'Lithium-Batterie'),
+ (728, 'Blei-Batterie'),
+ (729, 'Redox-Flow-Batterie'),
+ (730, 'Hochtemperaturbatterie'),
+ (731, 'Nickel-Cadmium- / Nickel-Metallhydridbatterie'),
+ (732, 'Sonstige Batterie')
+;
+
 DROP TABLE IF EXISTS mastr CASCADE;
 CREATE TABLE IF NOT EXISTS mastr (
     Id INT PRIMARY KEY,
