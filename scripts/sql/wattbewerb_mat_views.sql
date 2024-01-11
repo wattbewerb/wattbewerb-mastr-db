@@ -66,7 +66,8 @@ SELECT heute.gemeindeschluessel,
   heute.anzahl_anlagen anz_heute,
   ROUND(start.Summe_Bruttoleistung) Bruttoleistung_start,
   ROUND(heute.Summe_Bruttoleistung) Bruttoleistung_aktuell,
-  heute.Summe_Bruttoleistung-start.Summe_Bruttoleistung zuwachs_kwp
+  heute.Summe_Bruttoleistung-start.Summe_Bruttoleistung zuwachs_kwp,
+  round(((heute.Summe_Bruttoleistung-start.Summe_Bruttoleistung)/start.Summe_Bruttoleistung - 1::numeric) * 100::numeric, 2) AS zuwachs_prozent
 FROM statistik_heute_per_ags_plausibel heute
 FULL OUTER JOIN statistik_start_per_ags_plausibel start ON heute.gemeindeschluessel = start.gemeindeschluessel 
 WHERE start.Summe_Bruttoleistung > 0 AND heute.gemeindeschluessel IS NOT NULL
