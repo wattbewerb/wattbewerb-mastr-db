@@ -6,7 +6,7 @@ fi
 
 python3 03_download_mastr.py
 ./06_import_mastr.sh $1
-if [ "$#" -e 2 ]; then
+if [ "$#" = 2 ]; then
 	./06_import_mastr.sh $2
 fi
 zip -oD body.zip out/mastr.csv
