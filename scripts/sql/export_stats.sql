@@ -61,3 +61,15 @@ SET search_path=mastr,public;
 \COPY (SELECT t.name, z.gemeindeschluessel, (anz_start_geprueft+ anz_start_inpruefung) anz_start, ROUND((anz_start_geprueft + anz_start_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_start,  (anz_heute_geprueft + anz_heute_inpruefung) anz_heute,  ROUND((anz_heute_geprueft + anz_heute_inpruefung)*1.0/residents*1000.0,2) anz_je_1k_ew_heute,  (anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung) zuwachs_anz, ROUND(((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents*1000.0,1) zuwachs_anz_je_1k_ew FROM zuwachs_per_gemeinde z JOIN teilnehmer t ON t.ags=z.gemeindeschluessel WHERE residents >= 100000 ORDER BY ((anz_heute_geprueft + anz_heute_inpruefung)-(anz_start_geprueft+ anz_start_inpruefung)*1.0)/residents DESC) TO 'out/datawrapper_anlagen_zuwachs_je_1k_ew_grossstaedte.csv' WITH CSV DELIMITER ',' HEADER;
 
 \COPY (SElECT t.name, t.joinedat beitritt, t.residents ewz, t.communitytype kommunentyp, s.*, round(zuwachs_kwp/residents*1000,2) zuwachs_wp_je_ew  FROM mastr.teilnehmer t JOIN mastr.zuwachs_per_gemeinde s on t.ags=s.gemeindeschluessel ORDER BY communitytype, zuwachs_kwp/residents DESC) TO 'out/wattbewerb_ranking_tabelle.csv' WITH CSV DELIMITER ',' HEADER;
+
+-- out/wbw1_abschluss_ranking_kommunen
+\COPY (SELECT * FROM stat_ranking_final WHERE communitytype ='community' ORDER BY zuwachs_watt_per_ew DESC) TO 'out/wbw1_abschluss_ranking_kommunen_alle.csv' WITH CSV DELIMITER ',' HEADER;
+
+-- out/wbw1_abschluss_ranking_staedte
+\COPY (SELECT * FROM stat_ranking_final WHERE communitytype ='city' ORDER BY zuwachs_watt_per_ew DESC) TO 'out/wbw1_abschluss_ranking_staedte_alle.csv' WITH CSV DELIMITER ',' HEADER;
+
+-- out/wbw1_abschluss_ranking_grossstaedte
+\COPY (SELECT * FROM stat_ranking_final WHERE communitytype ='metropolis' ORDER BY zuwachs_watt_per_ew DESC) TO 'out/wbw1_abschluss_ranking_grossstaedte_alle.csv' WITH CSV DELIMITER ',' HEADER;
+
+-- out/wbw2_ranking
+\COPY (SELECT * FROM stat_ranking_2_0 ORDER BY zuwachs_watt_per_ew DESC) TO 'out/wbw2_ranking_alle.csv' WITH CSV DELIMITER ',' HEADER;

@@ -8,13 +8,22 @@ FROM mastr
 WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-21' AND HauptbrennstoffId IS NULL) as anlage
 GROUP BY ags, IsNBPruefungAbgeschlossen);
 
+DROP MATERIALIZED VIEW IF EXISTS statistik_ende_wbw1_per_ags CASCADE;
+CREATE MATERIALIZED VIEW statistik_ende_wbw1_per_ags AS
+(SELECT ags gemeindeschluessel, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
+(SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
+FROM mastr
+WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2023-10-01' AND HauptbrennstoffId IS NULL) as anlage
+GROUP BY ags);
+
+
 DROP MATERIALIZED VIEW IF EXISTS statistik_start_per_ags_plausibel CASCADE;
 CREATE MATERIALIZED VIEW statistik_start_per_ags_plausibel AS
 (SELECT ags gemeindeschluessel, count(*) anzahl_anlagen, sum(brutto) Summe_Bruttoleistung, sum(netto) Summe_Nettonennleistung FROM 
 (SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
 FROM mastr
 WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND InbetriebnahmeDatum < '2021-02-21' AND HauptbrennstoffId IS NULL
-AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <300)
+AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <220)
 ) as anlage
 GROUP BY ags);
 
@@ -24,7 +33,7 @@ CREATE MATERIALIZED VIEW statistik_heute_per_ags_plausibel AS
 (SELECT Gemeindeschluessel ags, Bruttoleistung brutto, Nettonennleistung netto
 FROM mastr
 WHERE EnergietraegerId=2495 AND MaStRNummer LIKE 'SEE%' AND BetriebsStatusId=35 AND HauptbrennstoffId IS NULL
-AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <300)
+AND MaStRNummer NOT IN (SELECT MaStRNummer FROM checks WHERE check_code <220)
 ) as anlage
 GROUP BY ags);
 
@@ -134,6 +143,74 @@ LEFT JOIN zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
 LEFT JOIN unplausible_bruttoleistung_je_gemeinde b ON t.ags = b.gemeindeschluessel
 ORDER BY (zuwachs_kwp-bruttoleistung_unplausibel)/residents DESC;
 
+
+CREATE OR REPLACE VIEW zuwachs_ende_wbw1_per_gemeinde AS
+SELECT statistik_ende_wbw1_per_ags.gemeindeschluessel,
+  start_geprueft.anzahl_anlagen AS anz_start_geprueft,
+  COALESCE(start_inpruefung.anzahl_anlagen, 0) AS anz_start_inpruefung,
+  COALESCE(statistik_ende_wbw1_per_ags.anzahl_anlagen, 0) AS anz_ende_wbw1,
+  round(COALESCE(start_geprueft.summe_bruttoleistung,0)) AS bruttoleistung_start_geprueft,
+  round(COALESCE(statistik_ende_wbw1_per_ags.summe_bruttoleistung,0)) AS bruttoleistung_ende_wbw1,
+  round(COALESCE(start_inpruefung.summe_bruttoleistung, 0)) AS bruttoleistung_start_inpruefung,
+  round(COALESCE(statistik_ende_wbw1_per_ags.summe_bruttoleistung, 0) - (COALESCE(start_geprueft.summe_bruttoleistung,0) + COALESCE(start_inpruefung.summe_bruttoleistung, 0)), 2) AS zuwachs_kwp
+  FROM mastr.statistik_ende_wbw1_per_ags 
+   FULL JOIN mastr.statistik_start_per_ags start_geprueft ON statistik_ende_wbw1_per_ags.gemeindeschluessel = start_geprueft.gemeindeschluessel AND start_geprueft.isnbpruefungabgeschlossen = 2954
+   FULL JOIN mastr.statistik_start_per_ags start_inpruefung ON statistik_ende_wbw1_per_ags.gemeindeschluessel = start_inpruefung.gemeindeschluessel AND (start_inpruefung.isnbpruefungabgeschlossen = 2955 or start_inpruefung.isnbpruefungabgeschlossen is null)
+ WHERE 
+   COALESCE(start_geprueft.summe_bruttoleistung,0) + coalesce(start_inpruefung.summe_bruttoleistung, 0) > 0::numeric
+  AND 
+   statistik_ende_wbw1_per_ags.gemeindeschluessel IS NOT null
+ ORDER BY (COALESCE(statistik_ende_wbw1_per_ags.summe_bruttoleistung,0) / (COALESCE(start_geprueft.summe_bruttoleistung,0) + COALESCE(start_inpruefung.summe_bruttoleistung, 0))) DESC;      
+
+
+DROP VIEW IF EXISTS stat_ranking_final;
+CREATE OR REPLACE VIEW stat_ranking_final AS
+SELECT t.*,  anz_start_geprueft + anz_start_inpruefung anz_start, anz_ende_wbw1,
+  bruttoleistung_start_geprueft + bruttoleistung_start_inpruefung bruttoleistung_start, bruttoleistung_ende_wbw1, zuwachs_kwp,
+ ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+LEFT JOIN zuwachs_ende_wbw1_per_gemeinde z ON t.ags = z.gemeindeschluessel
+ORDER BY zuwachs_kwp/residents DESC;
+
+
 DROP MATERIALIZED VIEW IF EXISTS letzte_aktualisierung;
 CREATE MATERIALIZED VIEW letzte_aktualisierung AS
 SELECT MAX(DatumLetzteAktualisierung) zeitpunkt FROM mastr.mastr; 
+
+DROP MATERIALIZED VIEW IF EXISTS stats_ranking_alle;
+CREATE MATERIALIZED VIEW stats_ranking_alle AS
+SELECT substr(ags, 1,5) kreis, t.gen || ' ' || t.bez "Gemeinde", 
+       bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung "Brutto kWp",
+       t.ewz "EWZ", 
+       ROUND((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung )/ewz*1000.,2) watt_per_ew,
+       ROUND(zuwachs_kwp/ewz*1000.,2) zuwachs_watt_per_ew,
+       ROUND((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung)/(bruttoleistung_start_geprueft +bruttoleistung_start_inpruefung)*100-100,1) "Zuwachs in % seit Start Wbw",
+       z.*
+  FROM mastr.vg250_gem t
+  LEFT JOIN mastr.zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
+WHERE gf=4 
+  AND ewz > 0
+  AND substr(ags, 1,5) ='05158'
+ORDER BY zuwachs_kwp/ewz DESC;
+
+DROP VIEW IF EXISTS mastr.stat_ranking_2_0;
+CREATE VIEW mastr.stat_ranking_2_0 AS
+SELECT 
+    substr(t.ags, 1, 2) AS landschluessel,
+    substr(t.ags, 1, 5) AS kreisschluessel,
+    z.gemeindeschluessel,
+    substr(t.ars, 1, 9) verbandschluessel,
+    t.ars regionalschluessel,
+    t.bez AS bezeichnung,
+    t.gen AS name,
+    t.ewz,
+    round((z.bruttoleistung_aktuell_geprueft + z.bruttoleistung_aktuell_inpruefung) * 1000.0 / t.ewz, 2) AS watt_per_ew,
+    round(z.zuwachs_kwp * 1000.0 / t.ewz , 2) AS zuwachs_watt_per_ew,
+    z.zuwachs_prozent AS zuwachs_watt_prozent,
+    z.anz_start_geprueft + z.anz_start_inpruefung AS anzahl_start,
+    z.anz_heute_geprueft + z.anz_heute_inpruefung AS anzahl_aktuell,
+    z.bruttoleistung_start_geprueft + z.bruttoleistung_start_inpruefung AS brutoleistung_start_kwp,
+    z.bruttoleistung_aktuell_geprueft + z.bruttoleistung_aktuell_inpruefung AS brutoleistung_aktuell_kwp,
+    z.zuwachs_kwp
+   FROM mastr.vg250_gem t
+     LEFT JOIN mastr.zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
+  WHERE t.gf = 4 AND t.ewz > 0;
