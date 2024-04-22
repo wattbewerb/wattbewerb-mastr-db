@@ -65,6 +65,10 @@ def download_page(url, page, file_name):
     df["KwkAnlageRegistrierungsdatum"] = to_iso_date(df, "KwkAnlageRegistrierungsdatum")
 
 
+    # Patch LatLon errors (see https://github.com/wattbewerb/wattbewerb-mastr-db/issues/8) 
+    df['Laengengrad'].where(df['Laengengrad'] > 180, 180, inplace=True)
+    df['Breitengrad'].where(df['Breitengrad'] > 90, 90, inplace=True)
+
     # Render IDs as ints 
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
         'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
