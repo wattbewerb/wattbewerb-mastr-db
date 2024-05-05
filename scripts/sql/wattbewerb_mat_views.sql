@@ -221,3 +221,18 @@ SELECT substr(ags,1,2) landschluessel, substr(ags, 1,5) kreisschluessel, substr(
   FROM  mastr.vg250_gem g
   JOIN mastr.mastr m ON g.ags= m.gemeindeschluessel 
   WHERE gf=4;
+
+CREATE MATERIALIZED VIEW mastr.pv_groessenklassen_je_ags AS
+(SELECT groessenklasse, substr(gemeindeschluessel,1,2) landschluessel, substr(gemeindeschluessel,1,5) kreisschluessel,gemeindeschluessel, SUM(bruttoleistung) bruttoleistung, COUNT(bruttoleistung) Anzahl
+  FROM
+(SELECT CASE WHEN bruttoleistung<0.8 THEN '< 0,8 kW' 
+            WHEN bruttoleistung<10 THEN '>= 0,8 und < 10 kW' 
+            WHEN bruttoleistung<20 THEN '>= 10 und < 20 kW' 
+            WHEN bruttoleistung<30 THEN '>= 20 und < 30 kW' 
+            WHEN bruttoleistung<100 THEN '>= 30 und < 100 kW' 
+            ELSE 'ab 100 kW' 
+       END groessenklasse, bruttoleistung, gemeindeschluessel  
+     FROM mastr.mastr 
+    WHERE betriebsstatusid=35 
+      AND energietraegerid=2495
+) AS A GROUP BY groessenklasse,gemeindeschluessel);
