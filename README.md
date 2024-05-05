@@ -92,3 +92,7 @@ docker build -t mfdz/wattbewerb-mastr .
 docker run -v $PWD/out:/app/out/ mfdz/wattbewerb-mastr bash 02_download_and_import.sh <dbconnectstring1> [<dbconnectstring2>]
 ``` 
 
+## Änderungen
+* Mit [Version 22.2.98 des MaStR](https://www.marktstammdatenregister.de/MaStRHilfe/subpages/releasenotes.html) (veröffentlicht am 2.11.2022) werden statt der angefragten Anzahl Datensätze teilweise weniger zurückgeliefert. Zudem wurde die Eigenschaft `migriert` entfernt. Bestehende schemata müssen daher mit einem `ALTER TABLE mastr.mastr DROP COLUMN migriert; ALTER TABLE mastr.mastr DROP COLUMN statistik;`  angepasst werden. Dazu Umbenennungen der Eigenschaften 
+* Mit [Version 24.1.135 des MaStR](https://www.marktstammdatenregister.de/MaStRHilfe/subpages/releasenotes.html) (veröffentlicht am 2.5.2024) entfiel das Feld GemeinsamerWechselrichter.Skript `scripts/sql/00_schema_changes.sql` entfernt dieses Feld aus der `mastr`-Tabelle.
+

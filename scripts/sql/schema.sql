@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     -- Zuschlagsnummern TEXT, new in 07-11.03.2022, for now ignore
     EnergietraegerId INT,
     EnergietraegerName TEXT,
-    GemeinsamerWechselrichter INT,
+    --GemeinsamerWechselrichter INT, -- removed with MaStR release 24.1.135 on 2024-05-02
     Genehmigungbehoerde TEXT,
     GenehmigungDatum DATE,
     GenehmigungRegistrierungsdatum DATE,

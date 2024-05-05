@@ -72,7 +72,7 @@ def download_page(url, page, file_name):
     # Render IDs as ints 
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
         'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
-        'NutzungsbereichGebSA','GemeinsamerWechselrichter','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
+        'NutzungsbereichGebSA','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
         'AnzahlSolarModule','TechnologieStromerzeugungId',
         'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage']:
         try:
