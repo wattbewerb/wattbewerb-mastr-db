@@ -214,3 +214,10 @@ SELECT
    FROM mastr.vg250_gem t
      LEFT JOIN mastr.zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
   WHERE t.gf = 4 AND t.ewz > 0;
+
+DROP VIEW IF EXISTS mastr.mastr_mit_ars;
+CREATE VIEW mastr.mastr_mit_ars AS
+SELECT substr(ags,1,2) landschluessel, substr(ags, 1,5) kreisschluessel, substr(ars,1,9) verbandschluessel, ars regiooalschluessel, m.*
+  FROM  mastr.vg250_gem g
+  JOIN mastr.mastr m ON g.ags= m.gemeindeschluessel 
+  WHERE gf=4;
