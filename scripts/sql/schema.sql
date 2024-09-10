@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS mastr (
     EnergietraegerName TEXT,
     --GemeinsamerWechselrichter INT, -- removed with MaStR release 24.1.135 on 2024-05-02
     Genehmigungbehoerde TEXT,
-    GenehmigungDatum DATE,
+    -- GenehmigungDatum DATE, -- removed with MaStR release 24.1.141 (?)
     GenehmigungRegistrierungsdatum DATE,
     GenehmigungsMastrNummer TEXT,
     Gruppierungsobjekte TEXT,

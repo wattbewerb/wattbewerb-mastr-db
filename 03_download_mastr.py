@@ -59,7 +59,7 @@ def download_page(url, page, file_name):
     df["InbetriebnahmeDatum"] = to_iso_date(df, "InbetriebnahmeDatum")
     df["EegAnlageRegistrierungsdatum"] = to_iso_date(df, "EegAnlageRegistrierungsdatum")
     df["EegInbetriebnahmeDatum"] = to_iso_date(df, "EegInbetriebnahmeDatum")
-    df["GenehmigungDatum"] = to_iso_date(df, "GenehmigungDatum")
+    # df["GenehmigungDatum"] = None # to_iso_date(df, "GenehmigungDatum") Removed 
     df["GenehmigungRegistrierungsdatum"] = to_iso_date(df, "GenehmigungRegistrierungsdatum")
     df["KwkAnlageInbetriebnahmedatum"] = to_iso_date(df, "KwkAnlageInbetriebnahmedatum")
     df["KwkAnlageRegistrierungsdatum"] = to_iso_date(df, "KwkAnlageRegistrierungsdatum")
