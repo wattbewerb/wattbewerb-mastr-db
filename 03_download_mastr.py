@@ -48,7 +48,7 @@ def download_page(url, page, file_name):
         'Zuschlagsnummern','BiomasseArtBezeichnung',
         'StromspeichertechnologieBezeichnung'], inplace=True)
 
-    # Convert mastr dateformat to iso date/timestamps
+    # Convert mastr dateformat to iso  date/timestamps
     df["DatumLetzteAktualisierung"] = to_iso_date(df, "DatumLetzteAktualisierung")
     df["EinheitRegistrierungsdatum"] = to_iso_date(df, "EinheitRegistrierungsdatum")
     df["EndgueltigeStilllegungDatum"] = to_iso_date(df, "EndgueltigeStilllegungDatum")
@@ -60,11 +60,6 @@ def download_page(url, page, file_name):
     df["GenehmigungRegistrierungsdatum"] = to_iso_date(df, "GenehmigungRegistrierungsdatum")
     df["KwkAnlageInbetriebnahmedatum"] = to_iso_date(df, "KwkAnlageInbetriebnahmedatum")
     df["KwkAnlageRegistrierungsdatum"] = to_iso_date(df, "KwkAnlageRegistrierungsdatum")
-
-
-    # Patch LatLon errors (see https://github.com/wattbewerb/wattbewerb-mastr-db/issues/8) 
-    df['Laengengrad'].where(df['Laengengrad'] > 180, 180, inplace=True)
-    df['Breitengrad'].where(df['Breitengrad'] > 90, 90, inplace=True)
 
     # Render IDs as ints 
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
