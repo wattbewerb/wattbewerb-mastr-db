@@ -89,7 +89,7 @@ Um den Komplett-Abruf und Datenbankimport via Docker auszuführen, lässt sich v
 
 ```
 docker build -t mfdz/wattbewerb-mastr .
-docker run -v $PWD/out:/app/out/ mfdz/wattbewerb-mastr bash 02_download_and_import.sh <dbconnectstring1> [<dbconnectstring2>]
+docker run -v $PWD/out:/app/out/ mfdz/wattbewerb-mastr bash 02_download_and_import.sh <dbconnectstring1> [<dbconnectstring2>] &> out/import.log
 ``` 
 
 ## Änderungen
