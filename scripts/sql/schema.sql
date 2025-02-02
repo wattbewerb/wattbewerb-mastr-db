@@ -167,6 +167,16 @@ INSERT INTO VollTeilEinspeisung_LT VALUES
  (688,'Volleinspeisung'),
  (689,'Teileinspeisung');
 
+DROP TABLE IF EXISTS BiomasseArt_LT;
+CREATE TABLE IF NOT EXISTS BiomasseArt_LT (
+  key INT PRIMARY KEY,
+  value TEXT
+);
+INSERT INTO BiomasseArt_LT VALUES
+ (719,'Flüssige Biomasse'),
+ (720,'Feste Biomasse'),
+ (721,'Gasförmige Biomasse');
+
 DROP TABLE IF EXISTS Energietraeger_LT;
 CREATE TABLE IF NOT EXISTS Energietraeger_LT (
   key INT PRIMARY KEY,
@@ -260,8 +270,10 @@ CREATE TABLE IF NOT EXISTS mastr (
     AktenzeichenGenehmigung TEXT,
     AnzahlSolarModule INT,
     Batterietechnologie INT,
+    BiomasseArt INT,
     Bruttoleistung NUMERIC(12, 3),
     EegInbetriebnahmeDatum DATE,
+    EegInstallierteLeistung NUMERIC(12,3),
     EegAnlageMastrNummer TEXT,
     EegAnlageRegistrierungsdatum DATE,
     EegAnlagenschluessel TEXT,
@@ -282,8 +294,9 @@ CREATE TABLE IF NOT EXISTS mastr (
     HauptneigungswinkelSolarmodule INT,
     HerstellerWindenergieanlage INT,
     HerstellerWindenergieanlageBezeichnung TEXT, -- Potentiell hoher Nachführungsaufwand, daher nicht normalisiert
-    IsAnonymisiert TEXT,
-    IsEinheitNotstromaggregat TEXT,
+    IsAnonymisiert BOOLEAN, -- Boolean
+    IsBuergerenergie BOOLEAN,
+    IsEinheitNotstromaggregat BOOLEAN, --Bolean
     KraftwerkName TEXT,
     KraftwerkBlockName TEXT,
     KwkAnlageElektrischeLeistung NUMERIC(12,3),
@@ -304,14 +317,16 @@ CREATE TABLE IF NOT EXISTS mastr (
     Prototypanlage BOOLEAN,
     Regelzone INT,
     RotordurchmesserWindenergieanlage NUMERIC(5,1),
+    Stromspeichertechnologie INT, -- nun als Schlüsselwert
     SpannungsebenenId INT,
     SpannungsebenenNamen TEXT, -- Nicht normalisierte Ausgabe
+    ArtDerFlaecheBezeichnung TEXT,
     SpeicherEinheitMastrNummer TEXT,
     TechnologieStromerzeugungId INT,
     ThermischeNutzleistung NUMERIC(12,3),
     Typenbezeichnung TEXT,
     VollTeilEinspeisung INT,
-    WasserkraftErtuechtigung TEXT,
+    WasserkraftErtuechtigung BOOLEAN, -- Als Boolean
     WindClusterOstseeId INT,
     WindClusterNordseeId INT,
     WindparkName TEXT

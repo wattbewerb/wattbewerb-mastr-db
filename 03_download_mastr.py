@@ -45,11 +45,8 @@ def download_page(url, page, file_name):
     df.drop(columns=['Bundesland','StandortAnonymisiert','TechnologieStromerzeugung',
         'HauptausrichtungSolarModuleBezeichnung','HauptbrennstoffNamen',
         'VollTeilEinspeisungBezeichnung','BetriebsStatusName','SystemStatusName',
-        'Zuschlagsnummern'], inplace=True)
-
-    # Dropp columns currently not reflected by model
-    df.drop(columns=['IsBuergerenergie'], inplace=True)
-    df.drop(columns=['EegInstallierteLeistung'], inplace=True)
+        'Zuschlagsnummern','BiomasseArtBezeichnung',
+        'StromspeichertechnologieBezeichnung'], inplace=True)
 
     # Convert mastr dateformat to iso date/timestamps
     df["DatumLetzteAktualisierung"] = to_iso_date(df, "DatumLetzteAktualisierung")
@@ -73,7 +70,7 @@ def download_page(url, page, file_name):
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
         'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
         'NutzungsbereichGebSA','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
-        'AnzahlSolarModule','TechnologieStromerzeugungId',
+        'AnzahlSolarModule','TechnologieStromerzeugungId','BiomasseArt','Stromspeichertechnologie',
         'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage']:
         try:
             df[col] = df[col].map(lambda x: '' if pd.isnull(x) else '%.f' % x)
