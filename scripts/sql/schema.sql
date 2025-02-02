@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS teilnehmer (
   ags TEXT,
   name TEXT,
   communityType TEXT,
-  registerDate DATE,
+  joinedAt DATE,
   residents INT
 );
 CREATE UNIQUE INDEX name ON teilnehmer (ags);
