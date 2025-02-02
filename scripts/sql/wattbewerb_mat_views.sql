@@ -126,19 +126,19 @@ ORDER BY in_pruefung DESC;
 
 DROP VIEW IF EXISTS stat_ranking;
 CREATE OR REPLACE VIEW stat_ranking AS
-SELECT t.*, z.*, ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+SELECT t.*, z.*, ROUND((zuwachs_kwp/residents*1000)::numeric,2) zuwachs_watt_per_ew FROM TEILNEHMER t
 LEFT JOIN zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
 ORDER BY zuwachs_kwp/residents DESC;
 
 DROP VIEW IF EXISTS stat_ranking_plausibel;
 CREATE OR REPLACE VIEW stat_ranking_plausibel AS
-SELECT t.*, z.*, ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+SELECT t.*, z.*, ROUND((zuwachs_kwp/residents*1000)::numeric,2) zuwachs_watt_per_ew FROM TEILNEHMER t
 LEFT JOIN zuwachs_per_gemeinde_plausibel z ON t.ags = z.gemeindeschluessel
 ORDER BY zuwachs_kwp/residents DESC;
 
 DROP VIEW IF EXISTS stat_ranking_nur_plausible;
 CREATE OR REPLACE VIEW stat_ranking_nur_plausible AS
-SELECT t.*, z.*, ROUND((zuwachs_kwp-bruttoleistung_unplausibel)/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+SELECT t.*, z.*, ROUND(((zuwachs_kwp-bruttoleistung_unplausibel)/residents*1000)::numeric,2) zuwachs_watt_per_ew FROM TEILNEHMER t
 LEFT JOIN zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
 LEFT JOIN unplausible_bruttoleistung_je_gemeinde b ON t.ags = b.gemeindeschluessel
 ORDER BY (zuwachs_kwp-bruttoleistung_unplausibel)/residents DESC;
@@ -167,7 +167,7 @@ DROP VIEW IF EXISTS stat_ranking_final;
 CREATE OR REPLACE VIEW stat_ranking_final AS
 SELECT t.*,  anz_start_geprueft + anz_start_inpruefung anz_start, anz_ende_wbw1,
   bruttoleistung_start_geprueft + bruttoleistung_start_inpruefung bruttoleistung_start, bruttoleistung_ende_wbw1, zuwachs_kwp,
- ROUND(zuwachs_kwp/residents*1000,2) zuwachs_watt_per_ew FROM TEILNEHMER t
+ ROUND((zuwachs_kwp/residents*1000)::numeric,2) zuwachs_watt_per_ew FROM TEILNEHMER t
 LEFT JOIN zuwachs_ende_wbw1_per_gemeinde z ON t.ags = z.gemeindeschluessel
 ORDER BY zuwachs_kwp/residents DESC;
 
@@ -181,9 +181,9 @@ CREATE MATERIALIZED VIEW stats_ranking_alle AS
 SELECT substr(ags, 1,5) kreis, t.gen || ' ' || t.bez "Gemeinde", 
        bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung "Brutto kWp",
        t.ewz "EWZ", 
-       ROUND((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung )/ewz*1000.,2) watt_per_ew,
-       ROUND(zuwachs_kwp/ewz*1000.,2) zuwachs_watt_per_ew,
-       ROUND((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung)/(bruttoleistung_start_geprueft +bruttoleistung_start_inpruefung)*100-100,1) "Zuwachs in % seit Start Wbw",
+       ROUND(((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung )/ewz*1000.)::numeric,2) watt_per_ew,
+       ROUND((zuwachs_kwp/ewz*1000.)::numeric,2) zuwachs_watt_per_ew,
+       ROUND(((bruttoleistung_aktuell_geprueft +bruttoleistung_aktuell_inpruefung)/(bruttoleistung_start_geprueft +bruttoleistung_start_inpruefung)*100-100)::numeric,1) "Zuwachs in % seit Start Wbw",
        z.*
   FROM mastr.vg250_gem t
   LEFT JOIN mastr.zuwachs_per_gemeinde z ON t.ags = z.gemeindeschluessel
@@ -203,8 +203,8 @@ SELECT
     t.bez AS bezeichnung,
     t.gen AS name,
     t.ewz,
-    round((z.bruttoleistung_aktuell_geprueft + z.bruttoleistung_aktuell_inpruefung) * 1000.0 / t.ewz, 2) AS watt_per_ew,
-    round(z.zuwachs_kwp * 1000.0 / t.ewz , 2) AS zuwachs_watt_per_ew,
+    round(((z.bruttoleistung_aktuell_geprueft + z.bruttoleistung_aktuell_inpruefung) * 1000.0 / t.ewz)::numeric, 2) AS watt_per_ew,
+    round((z.zuwachs_kwp * 1000.0 / t.ewz)::numeric, 2) AS zuwachs_watt_per_ew,
     z.zuwachs_prozent AS zuwachs_watt_prozent,
     z.anz_start_geprueft + z.anz_start_inpruefung AS anzahl_start,
     z.anz_heute_geprueft + z.anz_heute_inpruefung AS anzahl_aktuell,
