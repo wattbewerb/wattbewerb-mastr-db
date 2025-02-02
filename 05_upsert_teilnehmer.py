@@ -23,7 +23,7 @@ def do_upsert(dbconnectstring, competitors_url):
     # Need to set primary key column as index
     df = df.set_index('ags')
 
-    upsert(engine=engine,
+    upsert(con=engine,
            df=df,
            schema='mastr',
            table_name='teilnehmer',
