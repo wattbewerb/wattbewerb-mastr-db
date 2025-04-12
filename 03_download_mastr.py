@@ -60,10 +60,16 @@ def download_page(url, page, file_name):
     df["GenehmigungRegistrierungsdatum"] = to_iso_date(df, "GenehmigungRegistrierungsdatum")
     df["KwkAnlageInbetriebnahmedatum"] = to_iso_date(df, "KwkAnlageInbetriebnahmedatum")
     df["KwkAnlageRegistrierungsdatum"] = to_iso_date(df, "KwkAnlageRegistrierungsdatum")
+    # Version 25.1.158 split LageEinheit into "ArtDerSolaranlageId" and "WindAnLandOderSeeId"
+    # see https://www.marktstammdatenregister.de/MaStRHilfe/subpages/releasenotes.html
+    # Temporarilly, we copy ArtDerSolaranlageId to LageEinheit
+    df["LageEinheit"] = df["ArtDerSolaranlageId"] 
+    df["LageEinheitBezeichnung"] = df["ArtDerSolaranlageBezeichnung"]
+    
 
     # Render IDs as ints 
     for col in ['BundeslandId','HauptbrennstoffId','AnlagenbetreiberId','AnlagenbetreiberPersonenArt','IsNBPruefungAbgeschlossen',
-        'LokationId','Batterietechnologie','LageEinheit','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
+        'LokationId','Batterietechnologie','LageEinheit','ArtDerSolaranlageId','WindAnLandOderSeeId','Leistungsbegrenzung','Regelzone','VollTeilEinspeisung',
         'NutzungsbereichGebSA','HauptausrichtungSolarModule','HauptneigungswinkelSolarmodule',
         'AnzahlSolarModule','TechnologieStromerzeugungId','BiomasseArt','Stromspeichertechnologie',
         'WindClusterOstseeId','WindClusterNordseeId','SpannungsebenenId','HerstellerWindenergieanlage']:
