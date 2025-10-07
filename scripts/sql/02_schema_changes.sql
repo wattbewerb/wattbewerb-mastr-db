@@ -1,0 +1,10 @@
+ALTER TABLE mastr.mastr ADD COLUMN InbetriebnahmeDatumAmAktuellenOrt DATE;
+ALTER TABLE mastr.mastr ADD COLUMN SolarparkName TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN HauptneigungswinkelSolarmoduleBezeichnung TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN NutzungsbereichGebSABezeichnung TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN VorherigeNutzungsartDerFlaecheBezeichnung TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN VorherigerNutzungsartenBereichDerFlaecheBezeichnung TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN ZusaetzlicheFlaechenMerkmaleBezeichnung TEXT;
+ALTER TABLE mastr.mastr ADD COLUMN InAnspruchgenommeneFlaeche NUMERIC(10,5);
+ALTER TABLE mastr.mastr ADD COLUMN LichteHoehe NUMERIC(5,2);
+-- ALTER TABLE mastr.mastr DROP COLUMN ArtDerFlaecheBezeichnung;

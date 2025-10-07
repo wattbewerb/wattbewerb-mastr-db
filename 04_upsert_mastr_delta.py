@@ -16,6 +16,7 @@ def do_upsert(dbconnectstring, importfile):
     df["EndgueltigeStilllegungDatum"] = pd.to_datetime(df["EndgueltigeStilllegungDatum"].fillna("").str[6:-2], unit='ms')
     df["GeplantesInbetriebsnahmeDatum"] = pd.to_datetime(df["GeplantesInbetriebsnahmeDatum"].fillna("").str[6:-2], unit='ms')
     df["InbetriebnahmeDatum"] = pd.to_datetime(df["InbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
+    df["InbetriebnahmeDatumAmAktuellenOrt"] = pd.to_datetime(df["InbetriebnahmeDatumAmAktuellenOrt"].fillna("").str[6:-2], unit='ms')
     df["EegAnlageMeldedatum"] = pd.to_datetime(df["EegAnlageMeldedatum"].fillna("").str[6:-2], unit='ms')
     df["EegInbetriebnahmeDatum"] = pd.to_datetime(df["EegInbetriebnahmeDatum"].fillna("").str[6:-2], unit='ms')
     df["GenehmigungDatum"] = pd.to_datetime(df["GenehmigungDatum"].fillna("").str[6:-2], unit='ms')
