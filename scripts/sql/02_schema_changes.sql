@@ -8,3 +8,4 @@ ALTER TABLE mastr.mastr ADD COLUMN ZusaetzlicheFlaechenMerkmaleBezeichnung TEXT;
 ALTER TABLE mastr.mastr ADD COLUMN InAnspruchgenommeneFlaeche NUMERIC(10,5);
 ALTER TABLE mastr.mastr ADD COLUMN LichteHoehe NUMERIC(5,2);
 -- ALTER TABLE mastr.mastr DROP COLUMN ArtDerFlaecheBezeichnung;
+ALTER TABLE mastr.mastr ALTER COLUMN InbetriebnahmeDatumAmAktuellenOrt TYPE TEXT;
