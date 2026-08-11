@@ -236,3 +236,44 @@ CREATE MATERIALIZED VIEW mastr.pv_groessenklassen_je_ags AS
     WHERE betriebsstatusid=35 
       AND energietraegerid=2495
 ) AS A GROUP BY groessenklasse,gemeindeschluessel);
+
+DROP VIEW mastr.wattbewerb_2_0;
+CREATE VIEW mastr.wattbewerb_2_0 AS
+WITH PV AS (SELECT m.gemeindeschluessel ags, inbetriebnahmedatum, bruttoleistung
+  FROM mastr.mastr m 
+  WHERE energietraegerid = 2495
+    AND betriebsstatusid = 35
+), today AS (
+SELECT ags, 0 zeitpunkt, sum(bruttoleistung) heute_kwp, count(1) heute_anzahl
+  FROM PV
+  GROUP BY ags
+), year_ AS (
+SELECT ags, 12 zeitpunkt, sum(bruttoleistung) jahr_kwp, count(1) jahr_anzahl
+  FROM PV
+  WHERE inbetriebnahmedatum <= current_date - interval '1 year'
+  GROUP BY ags
+), quarter AS (
+SELECT ags, 3 zeitpunkt, sum(bruttoleistung) quartal_kwp, count(1) quartal_anzahl
+  FROM PV
+  WHERE inbetriebnahmedatum <= current_date - interval '3 months'
+  GROUP BY ags
+), month_ AS (
+SELECT ags, 1 zeitpunkt, sum(bruttoleistung ) monat_kwp, count(1) monat_anzahl
+  FROM PV
+  WHERE inbetriebnahmedatum <= current_date - interval '1 month'
+  GROUP BY ags)
+SELECT substr(t.ags, 1, 2) AS landschluessel,
+    substr(t.ags, 1, 5) AS kreisschluessel,
+    t.ags,
+    substr(t.ars, 1, 9) verbandschluessel,
+    t.ars regionalschluessel,
+    t.bez AS bezeichnung,
+    t.gen AS name,
+    t.ewz,
+    heute_kwp, monat_kwp, quartal_kwp, jahr_kwp, heute_anzahl, monat_anzahl, quartal_anzahl, jahr_anzahl
+  FROM today
+  JOIN month_ on today.ags = month_.ags
+  JOIN quarter on today.ags = quarter.ags
+  JOIN year_ on today.ags = year_.ags
+  JOIN mastr.vg250_gem t ON t.ags = today.ags
+  WHERE t.gf = 4 AND t.ewz > 0;

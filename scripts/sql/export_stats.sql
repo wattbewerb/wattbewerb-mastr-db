@@ -73,3 +73,6 @@ SET search_path=mastr,public;
 
 -- out/wbw2_ranking
 \COPY (SELECT * FROM stat_ranking_2_0 ORDER BY zuwachs_watt_per_ew DESC) TO 'out/wbw2_ranking_alle.csv' WITH CSV DELIMITER ',' HEADER;
+
+-- out/wbw2_ranking
+\COPY (SELECT * FROM wattbewerb_2_0 ORDER BY regionalschluessel DESC) TO 'out/wbw2_pv_ausbau.csv' WITH CSV DELIMITER ',' HEADER;
